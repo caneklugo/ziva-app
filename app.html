@@ -3,30 +3,34 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Señal · Asistente de Accesibilidad Auditiva</title>
+  <title>Ziva · Asistente de Accesibilidad Auditiva</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Figtree:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&family=Playfair+Display:ital,wght@0,600;0,700;0,800;1,600;1,700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+  <link href="https://api.fontshare.com/v2/css?f[]=cabinet-grotesk@800,700,600,500,400&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #F8FAFC;
+      --bg: #FAF9FD;
       --surface: #FFFFFF;
-      --surface-subtle: #F1F5F9;
-      --border: #E2E8F0;
-      --border-focus: #CBD5E1;
+      --surface-subtle: #F5F3FF;
+      --border: #E8E5F3;
+      --border-focus: #DDD6FE;
       --text-main: #0F172A;
       --text-muted: #64748B;
       --text-subtle: #94A3B8;
-      --primary: #2563EB;
-      --primary-light: #EFF6FF;
-      --primary-dark: #1D4ED8;
+      --primary: #7C3AED;
+      --primary-light: #F5F3FF;
+      --primary-dark: #6D28D9;
+      --primary-glow: rgba(124, 58, 237, 0.25);
       --danger: #DC2626;
       --danger-light: #FEF2F2;
       --warning: #D97706;
       --warning-light: #FFFBEB;
       --success: #059669;
       --success-light: #ECFDF5;
-      --font: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-title: 'Playfair Display', Georgia, serif;
+      --font-grotesk: 'Cabinet Grotesk', -apple-system, sans-serif;
+      --font: 'Figtree', -apple-system, BlinkMacSystemFont, sans-serif;
       --font-mono: 'Space Grotesk', monospace;
     }
 
@@ -45,6 +49,7 @@
       justify-content: center;
       align-items: center;
       min-height: 100vh;
+      min-height: 100dvh;
       overflow-x: hidden;
       margin: 0;
     }
@@ -52,22 +57,26 @@
     /* Mobile Frame */
     .app-viewport {
       width: 100%;
-      max-width: 412px;
+      max-width: 420px;
       height: 100vh;
-      max-height: 890px;
+      height: 100dvh;
       background: var(--bg);
       display: flex;
       flex-direction: column;
       position: relative;
       overflow: hidden;
-      box-shadow: 0 25px 60px -15px rgba(15, 23, 42, 0.25), 0 0 0 1px rgba(0, 0, 0, 0.05);
     }
 
-    @media (min-width: 440px) {
+    @media (min-width: 480px) {
+      body {
+        padding: 20px;
+      }
       .app-viewport {
         border-radius: 40px;
         height: 860px;
+        max-height: 92vh;
         border: 8px solid #0F172A;
+        box-shadow: 0 25px 60px -15px rgba(15, 23, 42, 0.25), 0 0 0 1px rgba(0, 0, 0, 0.05);
       }
     }
 
@@ -101,7 +110,7 @@
       justify-content: space-between;
       background: var(--bg);
       flex-shrink: 0;
-      border-bottom: 1px solid rgba(226, 232, 240, 0.6);
+      border-bottom: 1px solid rgba(232, 229, 243, 0.8);
     }
 
     .brand {
@@ -111,21 +120,22 @@
     }
 
     .brand-icon {
-      width: 34px;
-      height: 34px;
-      border-radius: 10px;
-      background: linear-gradient(135deg, #2563EB, #1D4ED8);
+      width: 36px;
+      height: 36px;
+      border-radius: 11px;
+      background: linear-gradient(135deg, #8B5CF6, #6D28D9);
       display: flex;
       align-items: center;
       justify-content: center;
       color: #FFF;
-      box-shadow: 0 4px 10px rgba(37, 99, 235, 0.25);
+      box-shadow: 0 4px 12px rgba(124, 58, 237, 0.35);
     }
 
     .brand-title {
-      font-size: 19px;
+      font-family: var(--font-grotesk);
+      font-size: 22px;
       font-weight: 800;
-      letter-spacing: -0.02em;
+      letter-spacing: -0.01em;
       color: var(--text-main);
     }
 
@@ -138,6 +148,11 @@
       padding: 5px 12px;
       border-radius: 20px;
       font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
       font-weight: 600;
       color: var(--text-muted);
       cursor: pointer;
@@ -218,7 +233,7 @@
       position: absolute;
       inset: 0;
       border-radius: 50%;
-      border: 1.5px solid rgba(37, 99, 235, 0.15);
+      border: 1.5px solid rgba(124, 58, 237, 0.2);
       animation: ripple 3s cubic-bezier(0.2, 0.8, 0.2, 1) infinite;
     }
 
@@ -234,12 +249,12 @@
       width: 72px;
       height: 72px;
       border-radius: 50%;
-      background: linear-gradient(135deg, #2563EB, #1D4ED8);
+      background: linear-gradient(135deg, #8B5CF6, #6D28D9);
       display: flex;
       align-items: center;
       justify-content: center;
       color: #FFF;
-      box-shadow: 0 10px 25px rgba(37, 99, 235, 0.35);
+      box-shadow: 0 10px 25px rgba(124, 58, 237, 0.35);
       z-index: 2;
       transition: transform 0.2s;
     }
@@ -255,8 +270,10 @@
     }
 
     .listening-status {
-      font-size: 18px;
-      font-weight: 700;
+      font-family: var(--font-grotesk);
+      font-size: 21px;
+      font-weight: 800;
+      letter-spacing: -0.01em;
       color: var(--text-main);
       margin-bottom: 4px;
     }
@@ -992,8 +1009,9 @@
     }
 
     .alert-title-text {
-      font-size: 28px;
-      font-weight: 800;
+      font-family: var(--font-title);
+      font-size: 32px;
+      font-weight: 700;
       line-height: 1.15;
     }
 
@@ -1111,7 +1129,7 @@
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12h3l2-6 4 12 3-9 2 3h6"></path></svg>
         </div>
         <div>
-          <h1 class="brand-title">Señal</h1>
+          <h1 class="brand-title">Ziva</h1>
         </div>
       </div>
       <button class="profile-pill" id="profilePickerBtn" onclick="cycleProfile()">
