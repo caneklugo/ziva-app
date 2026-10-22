@@ -1,0 +1,1050 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Señal · Asistente de Accesibilidad Auditiva | Enactus</title>
+  <meta name="description" content="Asistente móvil de accesibilidad auditiva para personas sordas o con hipoacusia. Alertas de seguridad en tiempo real, transcripción inteligente y comunicación sin barreras.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0B0F19;
+      --bg-card: #111827;
+      --bg-card-hover: #1F2937;
+      --border: rgba(255, 255, 255, 0.08);
+      --border-accent: rgba(37, 99, 235, 0.4);
+      --text-main: #F9FAFB;
+      --text-muted: #9CA3AF;
+      --text-dim: #6B7280;
+      --primary: #3B82F6;
+      --primary-glow: rgba(59, 130, 246, 0.35);
+      --primary-dark: #1D4ED8;
+      --danger: #EF4444;
+      --warning: #F59E0B;
+      --success: #10B981;
+      --font: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: 'Space Grotesk', monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: var(--font);
+      background-color: var(--bg);
+      color: var(--text-main);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* Ambient background gradient glow */
+    .glow-orb {
+      position: absolute;
+      width: 600px;
+      height: 600px;
+      border-radius: 50%;
+      background: radial-gradient(circle, var(--primary-glow) 0%, rgba(11, 15, 25, 0) 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Navigation */
+    .navbar {
+      height: 72px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      background: rgba(11, 15, 25, 0.85);
+      backdrop-filter: blur(12px);
+      z-index: 100;
+    }
+
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: var(--text-main);
+    }
+
+    .brand-logo {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #3B82F6, #1D4ED8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #FFF;
+      box-shadow: 0 4px 14px rgba(59, 130, 246, 0.4);
+    }
+
+    .brand-title {
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    .enactus-pill {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      background: rgba(245, 158, 11, 0.15);
+      color: #FBBF24;
+      padding: 3px 8px;
+      border-radius: 6px;
+      border: 1px solid rgba(245, 158, 11, 0.3);
+    }
+
+    .nav-links {
+      display: none;
+      align-items: center;
+      gap: 28px;
+    }
+
+    @media (min-width: 768px) {
+      .nav-links {
+        display: flex;
+      }
+    }
+
+    .nav-link {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .nav-link:hover {
+      color: var(--text-main);
+    }
+
+    .cta-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--primary);
+      color: #FFF;
+      padding: 10px 20px;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 700;
+      text-decoration: none;
+      transition: all 0.2s;
+      box-shadow: 0 4px 14px rgba(59, 130, 246, 0.35);
+    }
+
+    .cta-btn:hover {
+      background: var(--primary-dark);
+      transform: translateY(-1px);
+    }
+
+    .cta-btn-outline {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-main);
+      box-shadow: none;
+    }
+
+    .cta-btn-outline:hover {
+      background: var(--bg-card);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    /* Hero Section */
+    .hero-section {
+      padding: 80px 0 60px;
+      text-align: center;
+      position: relative;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 14px;
+      border-radius: 20px;
+      background: rgba(59, 130, 246, 0.1);
+      border: 1px solid rgba(59, 130, 246, 0.25);
+      color: #93C5FD;
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 24px;
+    }
+
+    .hero-title {
+      font-size: 42px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.15;
+      max-width: 860px;
+      margin: 0 auto 20px;
+      background: linear-gradient(180deg, #FFFFFF 0%, #94A3B8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    @media (min-width: 768px) {
+      .hero-title {
+        font-size: 58px;
+      }
+    }
+
+    .hero-subtitle {
+      font-size: 18px;
+      color: var(--text-muted);
+      max-width: 640px;
+      margin: 0 auto 36px;
+      line-height: 1.6;
+    }
+
+    .hero-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 14px;
+      margin-bottom: 50px;
+    }
+
+    /* Embedded Interactive Phone Container */
+    .phone-showcase-wrapper {
+      position: relative;
+      margin: 20px auto 40px;
+      max-width: 440px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .phone-frame {
+      width: 100%;
+      height: 840px;
+      background: #000;
+      border-radius: 46px;
+      padding: 10px;
+      box-shadow: 0 35px 80px -15px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .phone-iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      border-radius: 38px;
+      background: #F8FAFC;
+    }
+
+    .phone-hint {
+      margin-top: 14px;
+      font-size: 13px;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* Problem & Stats Section */
+    .problem-section {
+      padding: 70px 0;
+      border-top: 1px solid var(--border);
+    }
+
+    .section-header {
+      text-align: center;
+      max-width: 680px;
+      margin: 0 auto 48px;
+    }
+
+    .section-eyebrow {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--primary);
+      margin-bottom: 10px;
+    }
+
+    .section-title {
+      font-size: 32px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: 12px;
+    }
+
+    .section-desc {
+      font-size: 16px;
+      color: var(--text-muted);
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 20px;
+      margin-bottom: 40px;
+    }
+
+    .stat-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 28px 24px;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.2s;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-2px);
+      border-color: rgba(255, 255, 255, 0.15);
+    }
+
+    .stat-number {
+      font-size: 42px;
+      font-weight: 800;
+      color: var(--primary);
+      font-family: var(--font-mono);
+      margin-bottom: 6px;
+      line-height: 1;
+    }
+
+    .stat-label {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 6px;
+      color: var(--text-main);
+    }
+
+    .stat-text {
+      font-size: 14px;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    /* MVP Features 3 Pillars */
+    .pillars-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 24px;
+      margin-top: 20px;
+    }
+
+    .pillar-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 32px 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      transition: all 0.2s;
+    }
+
+    .pillar-card:hover {
+      border-color: var(--border-accent);
+      background: var(--bg-card-hover);
+    }
+
+    .pillar-icon {
+      width: 52px;
+      height: 52px;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+    }
+
+    .icon-red { background: rgba(239, 68, 68, 0.15); color: var(--danger); }
+    .icon-blue { background: rgba(59, 130, 246, 0.15); color: var(--primary); }
+    .icon-green { background: rgba(16, 185, 129, 0.15); color: var(--success); }
+
+    .pillar-title {
+      font-size: 20px;
+      font-weight: 800;
+    }
+
+    .pillar-desc {
+      font-size: 14px;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    .pillar-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      font-size: 13px;
+      color: #D1D5DB;
+    }
+
+    .pillar-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+    }
+
+    .pillar-list li span:first-child {
+      color: var(--primary);
+      font-weight: 700;
+    }
+
+    /* Sound Matrix Grid */
+    .sound-matrix-section {
+      padding: 80px 0;
+      border-top: 1px solid var(--border);
+    }
+
+    .sounds-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+      gap: 16px;
+    }
+
+    .sound-item {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      transition: all 0.2s;
+    }
+
+    .sound-item:hover {
+      border-color: var(--primary);
+      transform: translateY(-2px);
+    }
+
+    .sound-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .sound-emoji {
+      font-size: 26px;
+    }
+
+    .prio-badge {
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      padding: 3px 8px;
+      border-radius: 8px;
+    }
+
+    .prio-critica { background: rgba(239, 68, 68, 0.18); color: #FCA5A5; }
+    .prio-alta { background: rgba(245, 158, 11, 0.18); color: #FCD34D; }
+    .prio-media { background: rgba(59, 130, 246, 0.18); color: #93C5FD; }
+
+    .sound-name {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .sound-detail {
+      font-size: 12px;
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
+
+    /* Pricing & Freemium Model */
+    .pricing-section {
+      padding: 80px 0;
+      border-top: 1px solid var(--border);
+    }
+
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 24px;
+      margin-top: 40px;
+    }
+
+    .pricing-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 28px;
+      padding: 36px 30px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      position: relative;
+    }
+
+    .pricing-card.highlight {
+      border-color: var(--primary);
+      box-shadow: 0 0 40px -10px var(--primary-glow);
+      background: linear-gradient(180deg, rgba(31, 41, 55, 0.8) 0%, rgba(17, 24, 39, 1) 100%);
+    }
+
+    .pricing-tag {
+      position: absolute;
+      top: -12px;
+      right: 28px;
+      background: var(--primary);
+      color: #FFF;
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      padding: 4px 12px;
+      border-radius: 20px;
+      letter-spacing: 0.05em;
+    }
+
+    .price-value {
+      font-size: 38px;
+      font-weight: 800;
+      font-family: var(--font-mono);
+      display: flex;
+      align-items: baseline;
+      gap: 4px;
+    }
+
+    .price-period {
+      font-size: 14px;
+      color: var(--text-muted);
+      font-weight: 500;
+      font-family: var(--font);
+    }
+
+    .price-features {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      font-size: 14px;
+      color: #E5E7EB;
+      flex: 1;
+    }
+
+    .price-features li {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .check-icon {
+      color: var(--success);
+      font-weight: 800;
+    }
+
+    /* Enactus Social Impact Section */
+    .impact-section {
+      padding: 80px 0;
+      border-top: 1px solid var(--border);
+    }
+
+    .impact-box {
+      background: linear-gradient(135deg, rgba(30, 41, 59, 0.7), rgba(15, 23, 42, 0.9));
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 30px;
+      padding: 48px 36px;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 36px;
+      align-items: center;
+    }
+
+    @media (min-width: 860px) {
+      .impact-box {
+        grid-template-columns: 1.2fr 0.8fr;
+      }
+    }
+
+    .impact-content h3 {
+      font-size: 28px;
+      font-weight: 800;
+      margin-bottom: 14px;
+    }
+
+    .impact-content p {
+      font-size: 15px;
+      color: var(--text-muted);
+      line-height: 1.6;
+      margin-bottom: 20px;
+    }
+
+    .ods-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .ods-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border-radius: 10px;
+      font-size: 12px;
+      font-weight: 700;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    /* Footer */
+    .footer {
+      border-top: 1px solid var(--border);
+      padding: 40px 0 30px;
+      color: var(--text-dim);
+      font-size: 13px;
+    }
+
+    .footer-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      text-align: center;
+    }
+
+    @media (min-width: 768px) {
+      .footer-content {
+        flex-direction: row;
+        text-align: left;
+      }
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 20px;
+    }
+
+    .footer-links a {
+      color: var(--text-muted);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .footer-links a:hover {
+      color: var(--text-main);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Ambient Light Orbs -->
+  <div class="glow-orb" style="top: -200px; left: 50%; transform: translateX(-50%);"></div>
+
+  <!-- Navigation -->
+  <nav class="navbar">
+    <div class="container" style="display: flex; align-items: center; justify-content: space-between;">
+      <a href="#" class="nav-brand">
+        <div class="brand-logo">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M2 12h3l2-6 4 12 3-9 2 3h6"></path></svg>
+        </div>
+        <span class="brand-title">Señal</span>
+        <span class="enactus-pill">Enactus Project</span>
+      </a>
+
+      <div class="nav-links">
+        <a href="#funciones" class="nav-link">Funciones MVP</a>
+        <a href="#demo" class="nav-link">Prototipo Interactivo</a>
+        <a href="#alertas" class="nav-link">Alertas de Seguridad</a>
+        <a href="#modelo" class="nav-link">Modelo Freemium</a>
+        <a href="#impacto" class="nav-link">Impacto Social</a>
+      </div>
+
+      <div style="display: flex; gap: 10px;">
+        <a href="app.html" target="_blank" class="cta-btn">
+          <span>Abrir Prototipo Móvil</span>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <div class="container">
+      <div class="hero-badge">
+        <span>🚀 Prototipo MVP de Alta Fidelidad</span>
+        <span>·</span>
+        <span>Accesibilidad Auditiva Universal</span>
+      </div>
+
+      <h1 class="hero-title">El entorno suena.<br>Ahora también se ve y se siente.</h1>
+      
+      <p class="hero-subtitle">
+        Asistente de accesibilidad auditiva para personas sordas o con hipoacusia. Detecta situaciones críticas en tiempo real, transcribe clases y conversaciones con detección de nombre propio, y rompe barreras de comunicación.
+      </p>
+
+      <div class="hero-buttons">
+        <a href="#demo" class="cta-btn" style="padding: 14px 28px; font-size: 16px;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+          <span>Probar en Simulador</span>
+        </a>
+        <a href="app.html" target="_blank" class="cta-btn cta-btn-outline" style="padding: 14px 28px; font-size: 16px;">
+          <span>Ver Pantalla Completa (Móvil)</span>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg>
+        </a>
+      </div>
+
+      <!-- Live Interactive Prototype Embed -->
+      <div class="phone-showcase-wrapper" id="demo">
+        <div class="phone-frame">
+          <iframe src="app.html" class="phone-iframe" title="Prototipo Interactivo de Señal"></iframe>
+        </div>
+        <div class="phone-hint">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+          <span>Interactivo: Toca los botones de alertas, la transcripción o el pizarrón gigante directamente arriba.</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Problem / Context Section -->
+  <section class="problem-section" id="problema">
+    <div class="container">
+      <div class="section-header">
+        <div class="section-eyebrow">La Realidad en México y Latinoamérica</div>
+        <h2 class="section-title">El Silencio Involuntario Frente al Peligro</h2>
+        <p class="section-desc">Millones de personas con discapacidad auditiva enfrentan exclusión académica y riesgos de protección civil todos los días.</p>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-number">+2.3M</div>
+          <div class="stat-label">Personas con pérdida auditiva</div>
+          <div class="stat-text">En México, según el INEGI, sin herramientas tecnológicas integradas para su autonomía en espacios públicos.</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">82%</div>
+          <div class="stat-label">Aulas sin intérprete de LSM</div>
+          <div class="stat-text">La mayoría de las universidades no cuentan con intérpretes suficientes, obligando a los estudiantes a perder contenido crítico.</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">100%</div>
+          <div class="stat-label">Alertas sonoras desatendidas</div>
+          <div class="stat-text">Sirenas de ambulancias, alarmas sísmicas o de incendio no tienen alternativa háptica ni visual en el celular cotidiano.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Core MVP Features (3 Pillars from PDF) -->
+  <section class="problem-section" id="funciones">
+    <div class="container">
+      <div class="section-header">
+        <div class="section-eyebrow">Solución Integral (MVP)</div>
+        <h2 class="section-title">Diseñado con y para la Comunidad</h2>
+        <p class="section-desc">Sin pantallas saturadas ni interfaces artificiales. Una experiencia minimalista, intuitiva y rápida para situaciones reales.</p>
+      </div>
+
+      <div class="pillars-grid">
+        <!-- Pilar 1 -->
+        <div class="pillar-card">
+          <div class="pillar-icon icon-red">🚨</div>
+          <h3 class="pillar-title">Alertas Críticas de Seguridad</h3>
+          <p class="pillar-desc">
+            Detección acústica con modelos de inteligencia artificial en el dispositivo. Si ocurre una emergencia, la app toma la pantalla con información visual clara y vibración háptica.
+          </p>
+          <ul class="pillar-list">
+            <li><span>✓</span> <span>Detección de 9 situaciones críticas inmediatas</span></li>
+            <li><span>✓</span> <span>Brújula direccional espacial (de dónde viene el sonido)</span></li>
+            <li><span>✓</span> <span>Patrones de vibración háptica diferenciados</span></li>
+            <li><span>✓</span> <span>Sensibilidad por perfil (Universidad, Calle, Casa, Trabajo)</span></li>
+          </ul>
+        </div>
+
+        <!-- Pilar 2 -->
+        <div class="pillar-card">
+          <div class="pillar-icon icon-blue">🎙️</div>
+          <h3 class="pillar-title">Transcripción y Detección de Nombre</h3>
+          <p class="pillar-desc">
+            Subtitulado de voz a texto de baja latencia adaptado para clases universitarias, conferencias y reuniones de trabajo.
+          </p>
+          <ul class="pillar-list">
+            <li><span>✓</span> <span>Detección personalizada de tu nombre («Daniela»)</span></li>
+            <li><span>✓</span> <span>Resaltado visual y vibración al ser llamado</span></li>
+            <li><span>✓</span> <span>Diferenciación de interlocutores (Docente vs Compañeros)</span></li>
+            <li><span>✓</span> <span>Control dinámico de tamaño de tipografía (A− / A+)</span></li>
+          </ul>
+        </div>
+
+        <!-- Pilar 3 -->
+        <div class="pillar-card">
+          <div class="pillar-icon icon-green">💬</div>
+          <h3 class="pillar-title">Comunicador Visual y Auxilio SOS</h3>
+          <p class="pillar-desc">
+            Herramienta rápida para dialogar con personas oyentes sin fricciones, pedir indicaciones o solicitar auxilio con un solo toque.
+          </p>
+          <ul class="pillar-list">
+            <li><span>✓</span> <span>Pizarrón a pantalla completa de alto contraste (48px)</span></li>
+            <li><span>✓</span> <span>Banco de frases frecuentes configurables</span></li>
+            <li><span>✓</span> <span>Botón de emergencia SOS con envío de ubicación</span></li>
+            <li><span>✓</span> <span>Tarjeta de identidad accesible inmediata</span></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Complete Sound Matrix (MVP Document list) -->
+  <section class="sound-matrix-section" id="alertas">
+    <div class="container">
+      <div class="section-header">
+        <div class="section-eyebrow">Catálogo de Detección Sonora</div>
+        <h2 class="section-title">Las Alertas Esenciales de Nuestro MVP</h2>
+        <p class="section-desc">Cada sonido cuenta con una firma espectral, nivel de prioridad y patrón de vibración calibrado.</p>
+      </div>
+
+      <div class="sounds-grid">
+        <div class="sound-item">
+          <div class="sound-top">
+            <span class="sound-emoji">🚑</span>
+            <span class="prio-badge prio-critica">Crítica</span>
+          </div>
+          <div class="sound-name">Sirenas de patrulla / ambulancia</div>
+          <div class="sound-detail">Viene de vehículos de emergencia. Notifica con 3 pulsos largos y dirección del vehículo.</div>
+        </div>
+
+        <div class="sound-item">
+          <div class="sound-top">
+            <span class="sound-emoji">💥</span>
+            <span class="prio-badge prio-critica">Crítica</span>
+          </div>
+          <div class="sound-name">Disparos y detonaciones</div>
+          <div class="sound-detail">Detección de ondas de choque acústicas con vibración urgente máxima e indicación de resguardo.</div>
+        </div>
+
+        <div class="sound-item">
+          <div class="sound-top">
+            <span class="sound-emoji">📢</span>
+            <span class="prio-badge prio-alta">Alta</span>
+          </div>
+          <div class="sound-name">Gritos o peleas cercanas</div>
+          <div class="sound-detail">Análisis de entonación y volumen humano en rangos de auxilio o conflicto físico.</div>
+        </div>
+
+        <div class="sound-item">
+          <div class="sound-top">
+            <span class="sound-emoji">💣</span>
+            <span class="prio-badge prio-critica">Crítica</span>
+          </div>
+          <div class="sound-name">Explosiones</div>
+          <div class="sound-detail">Sonidos graves de alta presión sonora que activan el protocolo inmediato de protección civil.</div>
+        </div>
+
+        <div class="sound-item">
+          <div class="sound-top">
+            <span class="sound-emoji">🚨</span>
+            <span class="prio-badge prio-critica">Crítica</span>
+          </div>
+          <div class="sound-name">Alarmas de incendio</div>
+          <div class="sound-detail">Timbres cíclicos de evacuación. Muestra mensaje de seguir la ruta de salida de emergencia.</div>
+        </div>
+
+        <div class="sound-item">
+          <div class="sound-top">
+            <span class="sound-emoji">🔥</span>
+            <span class="prio-badge prio-critica">Crítica</span>
+          </div>
+          <div class="sound-name">Simulacros y evacuaciones</div>
+          <div class="sound-detail">Detección de altavoces de alarma sísmica o protocolos institucionales en escuelas y oficinas.</div>
+        </div>
+
+        <div class="sound-item">
+          <div class="sound-top">
+            <span class="sound-emoji">🚗</span>
+            <span class="prio-badge prio-alta">Alta</span>
+          </div>
+          <div class="sound-name">Accidentes o choques</div>
+          <div class="sound-detail">Frenados bruscos, colisiones de metal y cristales rotos en vía pública.</div>
+        </div>
+
+        <div class="sound-item">
+          <div class="sound-top">
+            <span class="sound-emoji">🗣️</span>
+            <span class="prio-badge prio-alta">Alta</span>
+          </div>
+          <div class="sound-name">Mención de tu nombre</div>
+          <div class="sound-detail">Identificación de fonemas clave («Daniela») para reintegrarse al diálogo en clase o trabajo.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Freemium & Business Model Section -->
+  <section class="pricing-section" id="modelo">
+    <div class="container">
+      <div class="section-header">
+        <div class="section-eyebrow">Modelo de Negocio & Sostenibilidad</div>
+        <h2 class="section-title">Freemium Ético: Seguridad para Todos</h2>
+        <p class="section-desc">Inspirado en modelos de accesibilidad global como Ava.me, adaptado a la economía estudiantil y corporativa de América Latina.</p>
+      </div>
+
+      <div class="pricing-grid">
+        <!-- Plan Gratis -->
+        <div class="pricing-card">
+          <div>
+            <div style="font-size: 13px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Para siempre</div>
+            <h3 style="font-size: 24px; font-weight: 800; margin-top: 4px;">Plan Esencial Gratuito</h3>
+          </div>
+
+          <div class="price-value">
+            <span>$0</span>
+            <span class="price-period">MXN / mes</span>
+          </div>
+
+          <p style="font-size: 14px; color: var(--text-muted);">
+            La seguridad física y las alertas de emergencia son un derecho humano incondicional.
+          </p>
+
+          <ul class="price-features">
+            <li><span class="check-icon">✓</span> <span>Detección de alertas críticas ilimitada</span></li>
+            <li><span class="check-icon">✓</span> <span>Detección de tu nombre propio</span></li>
+            <li><span class="check-icon">✓</span> <span>Vibración háptica y pantalla de auxilio</span></li>
+            <li><span class="check-icon">✓</span> <span>Transcripción básica para el día a día</span></li>
+            <li><span class="check-icon">✓</span> <span>2 perfiles principales (Casa y Universidad)</span></li>
+          </ul>
+
+          <a href="app.html" target="_blank" class="cta-btn cta-btn-outline" style="text-align: center; justify-content: center;">
+            Comenzar Gratis
+          </a>
+        </div>
+
+        <!-- Plan Premium -->
+        <div class="pricing-card highlight">
+          <div class="pricing-tag">Más Popular</div>
+          <div>
+            <div style="font-size: 13px; font-weight: 700; color: #93C5FD; text-transform: uppercase;">Autonomía Total</div>
+            <h3 style="font-size: 24px; font-weight: 800; margin-top: 4px;">Plan Premium Individual</h3>
+          </div>
+
+          <div class="price-value">
+            <span>$79</span>
+            <span class="price-period">MXN / mes</span>
+          </div>
+
+          <p style="font-size: 14px; color: var(--text-muted);">
+            Para estudiantes universitarios y profesionistas que requieren transcripción ilimitada e historial de notas.
+          </p>
+
+          <ul class="price-features">
+            <li><span class="check-icon">✓</span> <span><strong>Todo lo del plan gratuito</strong></span></li>
+            <li><span class="check-icon">✓</span> <span><strong>Transcripción de voz ilimitada</strong> en alta fidelidad</span></li>
+            <li><span class="check-icon">✓</span> <span>Guardar, exportar y buscar notas de clase</span></li>
+            <li><span class="check-icon">✓</span> <span>Historial completo de alertas sonoras</span></li>
+            <li><span class="check-icon">✓</span> <span>Perfiles ilimitados (Casa, Campus, Trabajo, Calle)</span></li>
+            <li><span class="check-icon">✓</span> <span>Patrones de vibración personalizados</span></li>
+            <li><span class="check-icon">✓</span> <span>Integración con Smartwatches (en desarrollo)</span></li>
+          </ul>
+
+          <a href="app.html" target="_blank" class="cta-btn" style="text-align: center; justify-content: center;">
+            Probar Premium en Prototipo
+          </a>
+        </div>
+
+        <!-- Plan Campus Enactus -->
+        <div class="pricing-card">
+          <div>
+            <div style="font-size: 13px; font-weight: 700; color: #FBBF24; text-transform: uppercase;">Alianzas Enactus</div>
+            <h3 style="font-size: 24px; font-weight: 800; margin-top: 4px;">Campus & Empresa Inclusiva</h3>
+          </div>
+
+          <div class="price-value">
+            <span>B2B</span>
+            <span class="price-period">Convenio Institucional</span>
+          </div>
+
+          <p style="font-size: 14px; color: var(--text-muted);">
+            Subvencionado por universidades y corporativos para sus estudiantes y empleados sordos (estilo Ava Campus).
+          </p>
+
+          <ul class="price-features">
+            <li><span class="check-icon">✓</span> <span>Licencias Premium 100% cubiertas para alumnos</span></li>
+            <li><span class="check-icon">✓</span> <span>Micrófonos de solapa inalámbricos para docentes</span></li>
+            <li><span class="check-icon">✓</span> <span>Focos y luces inteligentes para aulas inclusivas</span></li>
+            <li><span class="check-icon">✓</span> <span>Cumplimiento NOM-035 y métricas de inclusión ESG</span></li>
+            <li><span class="check-icon">✓</span> <span>Acompañamiento y soporte técnico prioritario</span></li>
+          </ul>
+
+          <a href="#impacto" class="cta-btn cta-btn-outline" style="text-align: center; justify-content: center;">
+            Contactar Equipo Enactus
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Social Impact Section -->
+  <section class="impact-section" id="impacto">
+    <div class="container">
+      <div class="impact-box">
+        <div class="impact-content">
+          <div class="section-eyebrow">Compromiso Enactus</div>
+          <h3>Tecnología con Propósito y Medición de Impacto</h3>
+          <p>
+            Enactus impulsa a la siguiente generación de líderes empresariales que utilizan la innovación para transformar vidas. Nuestro proyecto no es solo una app móvil: es un ecosistema de derechos humanos que permite a las personas con discapacidad auditiva acceder a la educación superior y al empleo digno con total seguridad.
+          </p>
+          <div class="ods-badges">
+            <span class="ods-badge">🎯 ODS 10: Reducción de Desigualdades</span>
+            <span class="ods-badge">📚 ODS 4: Educación Inclusiva</span>
+            <span class="ods-badge">🛡️ ODS 3: Salud y Bienestar</span>
+          </div>
+        </div>
+        <div style="background: rgba(0,0,0,0.3); border-radius: 20px; padding: 24px; text-align: center;">
+          <div style="font-size: 48px; margin-bottom: 10px;">🇲🇽</div>
+          <div style="font-size: 18px; font-weight: 800; color: #FFF; margin-bottom: 6px;">Enactus México</div>
+          <div style="font-size: 13px; color: var(--text-muted);">Competencia Nacional de Emprendimiento Social · Prototipo MVP Funcional</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container footer-content">
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <div class="brand-logo" style="width: 28px; height: 28px;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M2 12h3l2-6 4 12 3-9 2 3h6"></path></svg>
+        </div>
+        <span style="font-weight: 700; color: var(--text-main);">Señal · Asistente de Accesibilidad Auditiva</span>
+      </div>
+
+      <div class="footer-links">
+        <a href="app.html" target="_blank">Prototipo Móvil</a>
+        <a href="#funciones">Funciones</a>
+        <a href="#modelo">Precios</a>
+        <a href="https://github.com" target="_blank">GitHub</a>
+      </div>
+
+      <div>
+        <span>© 2026 Equipo Enactus. Construido para accesibilidad e inclusión.</span>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>

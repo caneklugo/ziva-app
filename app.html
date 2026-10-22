@@ -1,0 +1,1856 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Señal · Asistente de Accesibilidad Auditiva</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #F8FAFC;
+      --surface: #FFFFFF;
+      --surface-subtle: #F1F5F9;
+      --border: #E2E8F0;
+      --border-focus: #CBD5E1;
+      --text-main: #0F172A;
+      --text-muted: #64748B;
+      --text-subtle: #94A3B8;
+      --primary: #2563EB;
+      --primary-light: #EFF6FF;
+      --primary-dark: #1D4ED8;
+      --danger: #DC2626;
+      --danger-light: #FEF2F2;
+      --warning: #D97706;
+      --warning-light: #FFFBEB;
+      --success: #059669;
+      --success-light: #ECFDF5;
+      --font: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: 'Space Grotesk', monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: var(--font);
+      background-color: #E2E8F0;
+      color: var(--text-main);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      overflow-x: hidden;
+      margin: 0;
+    }
+
+    /* Mobile Frame */
+    .app-viewport {
+      width: 100%;
+      max-width: 412px;
+      height: 100vh;
+      max-height: 890px;
+      background: var(--bg);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 25px 60px -15px rgba(15, 23, 42, 0.25), 0 0 0 1px rgba(0, 0, 0, 0.05);
+    }
+
+    @media (min-width: 440px) {
+      .app-viewport {
+        border-radius: 40px;
+        height: 860px;
+        border: 8px solid #0F172A;
+      }
+    }
+
+    /* Top Status Bar (Native look) */
+    .status-bar {
+      height: 44px;
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-main);
+      background: var(--bg);
+      z-index: 10;
+      flex-shrink: 0;
+    }
+
+    .status-bar .notch-pill {
+      width: 90px;
+      height: 20px;
+      background: #0F172A;
+      border-radius: 12px;
+    }
+
+    /* Header */
+    .app-header {
+      padding: 10px 20px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--bg);
+      flex-shrink: 0;
+      border-bottom: 1px solid rgba(226, 232, 240, 0.6);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .brand-icon {
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #2563EB, #1D4ED8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #FFF;
+      box-shadow: 0 4px 10px rgba(37, 99, 235, 0.25);
+    }
+
+    .brand-title {
+      font-size: 19px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: var(--text-main);
+    }
+
+    .profile-pill {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .profile-pill:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+
+    .profile-pill .dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--success);
+    }
+
+    /* Main Scrollable View */
+    .app-content {
+      flex: 1;
+      overflow-y: auto;
+      overflow-x: hidden;
+      padding: 16px 18px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .app-content::-webkit-scrollbar {
+      display: none;
+    }
+
+    /* Screen Views */
+    .tab-view {
+      display: none;
+      flex-direction: column;
+      gap: 16px;
+      animation: fadeIn 0.2s ease-out;
+    }
+
+    .tab-view.active {
+      display: flex;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Radar View - Live Listening Section */
+    .listening-hero {
+      background: var(--surface);
+      border-radius: 24px;
+      border: 1px solid var(--border);
+      padding: 24px 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.03);
+    }
+
+    .radar-visualizer {
+      position: relative;
+      width: 140px;
+      height: 140px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 12px 0 16px;
+    }
+
+    .radar-ring {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      border: 1.5px solid rgba(37, 99, 235, 0.15);
+      animation: ripple 3s cubic-bezier(0.2, 0.8, 0.2, 1) infinite;
+    }
+
+    .radar-ring:nth-child(2) {
+      animation-delay: 1s;
+    }
+
+    .radar-ring:nth-child(3) {
+      animation-delay: 2s;
+    }
+
+    .radar-core {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #2563EB, #1D4ED8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #FFF;
+      box-shadow: 0 10px 25px rgba(37, 99, 235, 0.35);
+      z-index: 2;
+      transition: transform 0.2s;
+    }
+
+    .radar-core.paused {
+      background: #64748B;
+      box-shadow: 0 8px 20px rgba(100, 116, 139, 0.25);
+    }
+
+    @keyframes ripple {
+      0% { transform: scale(0.6); opacity: 0.8; }
+      100% { transform: scale(1.6); opacity: 0; }
+    }
+
+    .listening-status {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 4px;
+    }
+
+    .listening-sub {
+      font-size: 13px;
+      color: var(--text-muted);
+      max-width: 260px;
+      line-height: 1.4;
+      margin-bottom: 14px;
+    }
+
+    .audio-meter {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      height: 24px;
+      margin-bottom: 12px;
+    }
+
+    .meter-bar {
+      width: 4px;
+      border-radius: 2px;
+      background: var(--primary);
+      transition: height 0.15s ease;
+    }
+
+    .listen-toggle-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--surface-subtle);
+      border: 1px solid var(--border);
+      padding: 8px 18px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-main);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .listen-toggle-btn:hover {
+      background: #E2E8F0;
+    }
+
+    /* Simulation Bar (Clean, unobtrusive test pills) */
+    .section-label {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-muted);
+      margin: 4px 0 2px 2px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .demo-bar-wrapper {
+      background: var(--surface);
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      padding: 14px 16px;
+    }
+
+    .demo-bar-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .demo-bar-desc {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+    }
+
+    .demo-chips-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+
+    .demo-chip {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 10px 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-main);
+      cursor: pointer;
+      transition: all 0.15s;
+      text-align: center;
+    }
+
+    .demo-chip:hover {
+      border-color: var(--primary);
+      background: var(--primary-light);
+      color: var(--primary-dark);
+      transform: translateY(-1px);
+    }
+
+    .demo-chip:active {
+      transform: scale(0.96);
+    }
+
+    .demo-chip .icon-wrap {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .chip-critico .icon-wrap { background: var(--danger-light); color: var(--danger); }
+    .chip-alto .icon-wrap { background: var(--warning-light); color: var(--warning); }
+    .chip-info .icon-wrap { background: var(--primary-light); color: var(--primary); }
+
+    /* Recent Events Timeline */
+    .events-card {
+      background: var(--surface);
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      padding: 14px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .event-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .event-item:last-child {
+      border-bottom: none;
+      padding-bottom: 2px;
+    }
+
+    .event-badge {
+      width: 36px;
+      height: 36px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .event-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .event-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-main);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .event-meta {
+      font-size: 12px;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 2px;
+    }
+
+    .event-time {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-subtle);
+      font-family: var(--font-mono);
+    }
+
+    /* Screen 2: Transcribe */
+    .transcribe-controls {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      background: var(--surface);
+      padding: 10px 14px;
+      border-radius: 16px;
+      border: 1px solid var(--border);
+    }
+
+    .mode-toggle {
+      display: flex;
+      background: var(--bg);
+      padding: 3px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+    }
+
+    .mode-btn {
+      padding: 6px 12px;
+      border-radius: 9px;
+      font-size: 12px;
+      font-weight: 600;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      cursor: pointer;
+    }
+
+    .mode-btn.active {
+      background: var(--surface);
+      color: var(--primary);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    }
+
+    .font-stepper {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .stepper-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-main);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .transcript-window {
+      background: #0F172A;
+      color: #F8FAFC;
+      border-radius: 24px;
+      padding: 18px 16px;
+      min-height: 340px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      position: relative;
+    }
+
+    .transcript-bubble {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      animation: fadeIn 0.25s ease-out;
+    }
+
+    .speaker-tag {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: #94A3B8;
+    }
+
+    .speaker-prof .speaker-tag { color: #60A5FA; }
+    .speaker-mate .speaker-tag { color: #34D399; }
+    .speaker-name-alert {
+      background: rgba(245, 158, 11, 0.15);
+      border-left: 3px solid #F59E0B;
+      padding: 10px 12px;
+      border-radius: 0 12px 12px 0;
+    }
+
+    .speaker-name-alert .speaker-tag {
+      color: #FBBF24;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .dialogue-text {
+      font-size: 16px;
+      line-height: 1.45;
+      color: #F1F5F9;
+      transition: font-size 0.2s;
+    }
+
+    .transcript-status-bar {
+      margin-top: auto;
+      padding-top: 10px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 12px;
+      color: #94A3B8;
+    }
+
+    .live-dot {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #EF4444;
+      animation: pulseLive 1.4s infinite;
+    }
+
+    @keyframes pulseLive {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.85); }
+    }
+
+    .transcribe-action-btn {
+      width: 100%;
+      min-height: 50px;
+      border-radius: 16px;
+      border: none;
+      background: var(--primary);
+      color: #FFF;
+      font-size: 15px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(37, 99, 235, 0.25);
+      transition: all 0.2s;
+    }
+
+    .transcribe-action-btn.active {
+      background: var(--danger);
+      box-shadow: 0 4px 14px rgba(220, 38, 38, 0.25);
+    }
+
+    /* Screen 3: Communicate */
+    .quick-write-card {
+      background: var(--surface);
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .quick-textarea {
+      width: 100%;
+      height: 90px;
+      border: 1.5px solid var(--border);
+      border-radius: 14px;
+      padding: 12px;
+      font-family: inherit;
+      font-size: 16px;
+      color: var(--text-main);
+      resize: none;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .quick-textarea:focus {
+      border-color: var(--primary);
+    }
+
+    .write-btn-row {
+      display: flex;
+      gap: 8px;
+    }
+
+    .show-big-btn {
+      flex: 1;
+      min-height: 46px;
+      border-radius: 14px;
+      background: var(--text-main);
+      color: #FFF;
+      border: none;
+      font-size: 14px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      cursor: pointer;
+    }
+
+    .clear-btn {
+      min-height: 46px;
+      padding: 0 16px;
+      border-radius: 14px;
+      background: var(--surface-subtle);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .phrases-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .phrase-item {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 12px 14px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-main);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .phrase-item:hover {
+      border-color: var(--primary);
+      background: var(--primary-light);
+      color: var(--primary-dark);
+    }
+
+    .phrase-badge {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      background: var(--surface-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-muted);
+      font-size: 12px;
+    }
+
+    .sos-emergency-btn {
+      margin-top: 4px;
+      width: 100%;
+      min-height: 52px;
+      border-radius: 16px;
+      background: var(--danger-light);
+      border: 1.5px solid rgba(220, 38, 38, 0.2);
+      color: var(--danger);
+      font-size: 14px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .sos-emergency-btn:hover {
+      background: var(--danger);
+      color: #FFF;
+    }
+
+    /* Screen 4: Settings & MVP Alerts Customization */
+    .alerts-config-list {
+      background: var(--surface);
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      overflow: hidden;
+    }
+
+    .config-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .config-row:last-child {
+      border-bottom: none;
+    }
+
+    .config-info {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .config-name {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .config-tag {
+      font-size: 12px;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .prio-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+    }
+
+    /* iOS style toggle switch */
+    .ios-switch {
+      position: relative;
+      display: inline-block;
+      width: 44px;
+      height: 26px;
+      flex-shrink: 0;
+    }
+
+    .ios-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .ios-slider {
+      position: absolute;
+      cursor: pointer;
+      inset: 0;
+      background-color: #CBD5E1;
+      border-radius: 26px;
+      transition: 0.2s;
+    }
+
+    .ios-slider:before {
+      position: absolute;
+      content: "";
+      height: 20px;
+      width: 20px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      border-radius: 50%;
+      transition: 0.2s;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+    }
+
+    input:checked + .ios-slider {
+      background-color: var(--primary);
+    }
+
+    input:checked + .ios-slider:before {
+      transform: translateX(18px);
+    }
+
+    /* Freemium Tier Card */
+    .tier-box {
+      background: linear-gradient(135deg, #1E293B, #0F172A);
+      border-radius: 22px;
+      padding: 20px;
+      color: #FFF;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .tier-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+
+    .tier-title {
+      font-size: 17px;
+      font-weight: 800;
+    }
+
+    .tier-pill {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      background: rgba(245, 158, 11, 0.2);
+      color: #FBBF24;
+      padding: 4px 10px;
+      border-radius: 20px;
+      border: 1px solid rgba(245, 158, 11, 0.4);
+    }
+
+    .tier-desc {
+      font-size: 13px;
+      color: #94A3B8;
+      line-height: 1.4;
+      margin-bottom: 14px;
+    }
+
+    .tier-features {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      font-size: 12px;
+      color: #E2E8F0;
+      margin-bottom: 16px;
+    }
+
+    .tier-features li {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .tier-btn {
+      width: 100%;
+      min-height: 44px;
+      border-radius: 12px;
+      border: none;
+      background: #FFF;
+      color: #0F172A;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    /* Bottom Navigation Bar */
+    .bottom-nav {
+      height: 68px;
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      padding: 6px 10px;
+      flex-shrink: 0;
+      z-index: 10;
+    }
+
+    .nav-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 11px;
+      font-weight: 600;
+      transition: all 0.15s;
+    }
+
+    .nav-btn svg {
+      width: 22px;
+      height: 22px;
+      stroke-width: 2;
+    }
+
+    .nav-btn.active {
+      color: var(--primary);
+    }
+
+    .nav-btn.active svg {
+      stroke-width: 2.3;
+    }
+
+    /* FULLSCREEN ALERT OVERLAY (Immersive & Accessible) */
+    .alert-takeover {
+      position: absolute;
+      inset: 0;
+      z-index: 50;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      padding: 48px 24px 36px;
+      text-align: center;
+      color: #FFF;
+      animation: alertSlideIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    .alert-takeover.active {
+      display: flex;
+    }
+
+    @keyframes alertSlideIn {
+      from { opacity: 0; transform: scale(0.96); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    .alert-badge-top {
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 6px 14px;
+      border-radius: 20px;
+      background: rgba(0, 0, 0, 0.25);
+      backdrop-filter: blur(8px);
+    }
+
+    .alert-main-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .alert-visual-card {
+      width: 140px;
+      height: 140px;
+      border-radius: 36px;
+      background: rgba(255, 255, 255, 0.18);
+      border: 3px solid rgba(255, 255, 255, 0.8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+      animation: alertPulse 1.2s infinite alternate;
+    }
+
+    @keyframes alertPulse {
+      0% { transform: scale(0.96); }
+      100% { transform: scale(1.05); }
+    }
+
+    .alert-title-text {
+      font-size: 28px;
+      font-weight: 800;
+      line-height: 1.15;
+    }
+
+    .alert-sub-text {
+      font-size: 15px;
+      opacity: 0.92;
+      max-width: 290px;
+      line-height: 1.4;
+    }
+
+    .alert-direction-box {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: rgba(0, 0, 0, 0.25);
+      padding: 10px 18px;
+      border-radius: 18px;
+      backdrop-filter: blur(8px);
+    }
+
+    .compass-arrow {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      border: 2px solid #FFF;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.4s ease;
+    }
+
+    .vibrate-indicator {
+      font-size: 13px;
+      opacity: 0.85;
+      font-weight: 600;
+    }
+
+    .dismiss-alert-btn {
+      width: 100%;
+      min-height: 56px;
+      border-radius: 18px;
+      border: none;
+      background: #FFFFFF;
+      color: #0F172A;
+      font-size: 17px;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    }
+
+    /* FULLSCREEN BIG TEXT MODAL */
+    .big-text-modal {
+      position: absolute;
+      inset: 0;
+      background: #0F172A;
+      color: #FFF;
+      z-index: 60;
+      display: none;
+      flex-direction: column;
+      padding: 36px 24px 28px;
+      justify-content: space-between;
+    }
+
+    .big-text-modal.active {
+      display: flex;
+    }
+
+    .big-text-header {
+      font-size: 13px;
+      color: #94A3B8;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .big-text-body {
+      font-size: 34px;
+      font-weight: 800;
+      line-height: 1.25;
+      letter-spacing: -0.01em;
+      word-break: break-word;
+    }
+
+    .big-text-close {
+      width: 100%;
+      min-height: 52px;
+      border-radius: 16px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      background: transparent;
+      color: #FFF;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-viewport" id="mobileApp">
+    <!-- Status Bar -->
+    <div class="status-bar">
+      <span id="clockDisplay">09:41</span>
+      <div class="notch-pill"></div>
+      <div style="display: flex; align-items: center; gap: 6px;">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12.55a11 11 0 0 1 14.08 0"></path><path d="M1.42 9a16 16 0 0 1 21.16 0"></path><path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path><circle cx="12" cy="20" r="1"></circle></svg>
+        <span style="font-size: 11px;">5G</span>
+      </div>
+    </div>
+
+    <!-- App Header -->
+    <header class="app-header">
+      <div class="brand">
+        <div class="brand-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12h3l2-6 4 12 3-9 2 3h6"></path></svg>
+        </div>
+        <div>
+          <h1 class="brand-title">Señal</h1>
+        </div>
+      </div>
+      <button class="profile-pill" id="profilePickerBtn" onclick="cycleProfile()">
+        <span class="dot"></span>
+        <span id="activeProfileLabel">Universidad</span>
+      </button>
+    </header>
+
+    <!-- App Body (Tabs) -->
+    <main class="app-content">
+
+      <!-- ================= TAB 1: RADAR / ESCUCHA ACTIVA ================= -->
+      <section class="tab-view active" id="tab-radar">
+        <!-- Live Status Hero -->
+        <div class="listening-hero">
+          <div class="radar-visualizer">
+            <div class="radar-ring" id="ring1"></div>
+            <div class="radar-ring" id="ring2"></div>
+            <div class="radar-ring" id="ring3"></div>
+            <div class="radar-core" id="radarCoreIcon">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
+            </div>
+          </div>
+          <div class="listening-status" id="listenStateTitle">Escuchando entorno</div>
+          <div class="listening-sub" id="listenStateSub">Detectando sirenas, alarmas, choques y mención de tu nombre «Daniela»</div>
+
+          <!-- Dynamic Audio Meter -->
+          <div class="audio-meter" id="audioMeter">
+            <div class="meter-bar" style="height: 8px;"></div>
+            <div class="meter-bar" style="height: 14px;"></div>
+            <div class="meter-bar" style="height: 20px;"></div>
+            <div class="meter-bar" style="height: 12px;"></div>
+            <div class="meter-bar" style="height: 18px;"></div>
+            <div class="meter-bar" style="height: 9px;"></div>
+          </div>
+
+          <button class="listen-toggle-btn" onclick="toggleListening()">
+            <span id="toggleListenIcon">⏸</span>
+            <span id="toggleListenLabel">Pausar escucha</span>
+          </button>
+        </div>
+
+        <!-- Simulation Quick Tester -->
+        <div class="demo-bar-wrapper">
+          <div class="demo-bar-title">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polygon points="10 8 16 12 10 16 10 8"></polygon></svg>
+            <span>Simulador de alertas (MVP)</span>
+          </div>
+          <div class="demo-bar-desc">Toca cualquier sonido para probar la respuesta sensorial:</div>
+          <div class="demo-chips-grid">
+            <button class="demo-chip chip-critico" onclick="triggerAlert('sirena')">
+              <div class="icon-wrap">🚑</div>
+              <span>Sirena</span>
+            </button>
+            <button class="demo-chip chip-critico" onclick="triggerAlert('alarma')">
+              <div class="icon-wrap">🚨</div>
+              <span>Alarma</span>
+            </button>
+            <button class="demo-chip chip-critico" onclick="triggerAlert('disparo')">
+              <div class="icon-wrap">💥</div>
+              <span>Disparo</span>
+            </button>
+            <button class="demo-chip chip-alto" onclick="triggerAlert('choque')">
+              <div class="icon-wrap">🚗</div>
+              <span>Choque</span>
+            </button>
+            <button class="demo-chip chip-alto" onclick="triggerAlert('nombre')">
+              <div class="icon-wrap">🗣</div>
+              <span>«Daniela»</span>
+            </button>
+            <button class="demo-chip chip-alto" onclick="triggerAlert('grito')">
+              <div class="icon-wrap">📢</div>
+              <span>Grito</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Events Feed -->
+        <div>
+          <div class="section-label">
+            <span>Últimos eventos detectados</span>
+            <span style="font-size: 11px; font-weight: 500;" id="eventCountBadge">3 eventos</span>
+          </div>
+          <div class="events-card" id="eventsContainer">
+            <div class="event-item">
+              <div class="event-badge" style="background: var(--danger-light); color: var(--danger);">🚑</div>
+              <div class="event-info">
+                <div class="event-title">Sirena de emergencia</div>
+                <div class="event-meta">
+                  <span>Izquierda (270°)</span>
+                  <span>·</span>
+                  <span>88 dB</span>
+                </div>
+              </div>
+              <span class="event-time">11:42</span>
+            </div>
+            <div class="event-item">
+              <div class="event-badge" style="background: var(--primary-light); color: var(--primary);">🗣</div>
+              <div class="event-info">
+                <div class="event-title">Mención de tu nombre</div>
+                <div class="event-meta">
+                  <span>Atrás (180°)</span>
+                  <span>·</span>
+                  <span>Voz cercana</span>
+                </div>
+              </div>
+              <span class="event-time">10:15</span>
+            </div>
+            <div class="event-item">
+              <div class="event-badge" style="background: var(--warning-light); color: var(--warning);">🚗</div>
+              <div class="event-info">
+                <div class="event-title">Claxon / Accidente</div>
+                <div class="event-meta">
+                  <span>Derecha (90°)</span>
+                  <span>·</span>
+                  <span>78 dB</span>
+                </div>
+              </div>
+              <span class="event-time">09:05</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+
+      <!-- ================= TAB 2: TRANSCRIBIR ================= -->
+      <section class="tab-view" id="tab-voice">
+        <div class="transcribe-controls">
+          <div class="mode-toggle">
+            <button class="mode-btn active" id="modeClassBtn" onclick="setTranscribeMode('clase')">Clase / Reunión</button>
+            <button class="mode-btn" id="modeConvBtn" onclick="setTranscribeMode('conv')">1 a 1</button>
+          </div>
+          <div class="font-stepper">
+            <button class="stepper-btn" onclick="adjustFontSize(-2)">A−</button>
+            <button class="stepper-btn" onclick="adjustFontSize(2)">A+</button>
+          </div>
+        </div>
+
+        <div class="transcript-window" id="transcriptWindow">
+          <div class="transcript-bubble speaker-prof">
+            <span class="speaker-tag">Profesora (Economía)</span>
+            <div class="dialogue-text">Buenos días a todos. Hoy analizaremos el flujo de caja operativo y los costos fijos.</div>
+          </div>
+          <div class="transcript-bubble speaker-prof">
+            <span class="speaker-tag">Profesora</span>
+            <div class="dialogue-text">Es importante recordar que la depreciación no representa una salida real de efectivo.</div>
+          </div>
+          <div class="transcript-bubble speaker-mate">
+            <span class="speaker-tag">Compañero</span>
+            <div class="dialogue-text">¿Y cómo afecta eso al pago de impuestos del trimestre?</div>
+          </div>
+          <div class="transcript-bubble speaker-prof speaker-name-alert" id="nameMentionBubble">
+            <span class="speaker-tag">🔔 Mención detectada</span>
+            <div class="dialogue-text"><strong>Daniela</strong>, ¿puedes compartir tu conclusión del caso práctico con el grupo?</div>
+          </div>
+
+          <div class="transcript-status-bar">
+            <div style="display: flex; align-items: center; gap: 6px;">
+              <span class="live-dot" id="liveDotIndicator"></span>
+              <span id="transcribeStatusText">Escuchando en vivo…</span>
+            </div>
+            <span>Micrófono frontal</span>
+          </div>
+        </div>
+
+        <button class="transcribe-action-btn" id="toggleTranscribeBtn" onclick="toggleTranscriptionEngine()">
+          <span id="transcribeBtnIcon">⏸</span>
+          <span id="transcribeBtnLabel">Pausar transcripción</span>
+        </button>
+      </section>
+
+
+      <!-- ================= TAB 3: COMUNICAR ================= -->
+      <section class="tab-view" id="tab-chat">
+        <div class="quick-write-card">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-size: 13px; font-weight: 700;">Escribe tu mensaje</span>
+            <span style="font-size: 11px; color: var(--text-muted);">Se ve a distancia</span>
+          </div>
+          <textarea class="quick-textarea" id="userMsgInput" placeholder="Ej. ¿Me puedes escribir la indicación, por favor?"></textarea>
+          <div class="write-btn-row">
+            <button class="show-big-btn" onclick="showBigText()">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"></path></svg>
+              <span>Mostrar en pantalla grande</span>
+            </button>
+            <button class="clear-btn" onclick="clearMessage()">Borrar</button>
+          </div>
+        </div>
+
+        <div>
+          <div class="section-label">Frases rápidas de apoyo</div>
+          <div class="phrases-list">
+            <div class="phrase-item" onclick="usePhrase('Soy sordo/a. ¿Me lo puedes escribir aquí, por favor?')">
+              <div class="phrase-badge">✍️</div>
+              <span>Soy sordo/a. ¿Me lo puedes escribir?</span>
+            </div>
+            <div class="phrase-item" onclick="usePhrase('¿Me lo repite más despacio mirándome de frente?')">
+              <div class="phrase-badge">👀</div>
+              <span>¿Me lo repite de frente más despacio?</span>
+            </div>
+            <div class="phrase-item" onclick="usePhrase('¿Dónde está el aula de la clase o la salida?')">
+              <div class="phrase-badge">📍</div>
+              <span>¿Dónde está el aula o la salida?</span>
+            </div>
+            <div class="phrase-item" onclick="usePhrase('¿Cuánto cuesta en total?')">
+              <div class="phrase-badge">💳</div>
+              <span>¿Cuánto cuesta en total?</span>
+            </div>
+          </div>
+        </div>
+
+        <button class="sos-emergency-btn" onclick="triggerSos()">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+          <span>SOS · Enviar auxilio y ubicación</span>
+        </button>
+      </section>
+
+
+      <!-- ================= TAB 4: AJUSTES & FREEMIUM (MVP) ================= -->
+      <section class="tab-view" id="tab-settings">
+        <!-- Freemium status banner -->
+        <div class="tier-box">
+          <div class="tier-header">
+            <span class="tier-title" id="tierCardTitle">Plan Gratuito</span>
+            <span class="tier-pill" id="tierCardBadge">Esencial Activo</span>
+          </div>
+          <div class="tier-desc">Las alertas críticas de seguridad son un derecho humano y siempre serán gratuitas.</div>
+          <ul class="tier-features" id="tierFeatureList">
+            <li>✓ Alertas críticas (sirenas, disparos, alarmas)</li>
+            <li>✓ Detección de nombre («Daniela»)</li>
+            <li>✓ Transcripción básica de aula</li>
+            <li>✓ Vibración háptica en móvil</li>
+          </ul>
+          <button class="tier-btn" id="upgradeToggleBtn" onclick="toggleTier()">Probar funciones Premium</button>
+        </div>
+
+        <div>
+          <div class="section-label">Alertas configurables (MVP)</div>
+          <div class="alerts-config-list">
+            <div class="config-row">
+              <div class="config-info">
+                <span class="config-name">Sirenas de ambulancia y policía</span>
+                <span class="config-tag"><span class="prio-dot" style="background: var(--danger);"></span> Crítica · Vibración triple</span>
+              </div>
+              <label class="ios-switch">
+                <input type="checkbox" checked onchange="toggleAlertState('sirena')">
+                <span class="ios-slider"></span>
+              </label>
+            </div>
+
+            <div class="config-row">
+              <div class="config-info">
+                <span class="config-name">Disparos y detonaciones</span>
+                <span class="config-tag"><span class="prio-dot" style="background: var(--danger);"></span> Crítica · Vibración continua</span>
+              </div>
+              <label class="ios-switch">
+                <input type="checkbox" checked onchange="toggleAlertState('disparo')">
+                <span class="ios-slider"></span>
+              </label>
+            </div>
+
+            <div class="config-row">
+              <div class="config-info">
+                <span class="config-name">Alarmas de incendio y evacuación</span>
+                <span class="config-tag"><span class="prio-dot" style="background: var(--danger);"></span> Crítica · Pulso largo</span>
+              </div>
+              <label class="ios-switch">
+                <input type="checkbox" checked onchange="toggleAlertState('alarma')">
+                <span class="ios-slider"></span>
+              </label>
+            </div>
+
+            <div class="config-row">
+              <div class="config-info">
+                <span class="config-name">Accidentes y choques de auto</span>
+                <span class="config-tag"><span class="prio-dot" style="background: var(--warning);"></span> Alta · Pulso rápido</span>
+              </div>
+              <label class="ios-switch">
+                <input type="checkbox" checked onchange="toggleAlertState('choque')">
+                <span class="ios-slider"></span>
+              </label>
+            </div>
+
+            <div class="config-row">
+              <div class="config-info">
+                <span class="config-name">Mención de tu nombre propio</span>
+                <span class="config-tag"><span class="prio-dot" style="background: var(--primary);"></span> Alta · Doble pulso suave</span>
+              </div>
+              <label class="ios-switch">
+                <input type="checkbox" checked onchange="toggleAlertState('nombre')">
+                <span class="ios-slider"></span>
+              </label>
+            </div>
+
+            <div class="config-row">
+              <div class="config-info">
+                <span class="config-name">Gritos o peleas cercanas</span>
+                <span class="config-tag"><span class="prio-dot" style="background: var(--warning);"></span> Alta · 3 pulsos</span>
+              </div>
+              <label class="ios-switch">
+                <input type="checkbox" checked onchange="toggleAlertState('grito')">
+                <span class="ios-slider"></span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div class="section-label">Perfiles de sensibilidad</div>
+          <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px;">
+            <button class="demo-chip" style="border-color: var(--primary); background: var(--primary-light); color: var(--primary-dark);" onclick="selectProfile('Universidad')">
+              <strong>Universidad</strong>
+              <span style="font-size: 11px; color: var(--text-muted);">Voz + Sirenas</span>
+            </button>
+            <button class="demo-chip" onclick="selectProfile('Calle')">
+              <strong>Calle</strong>
+              <span style="font-size: 11px; color: var(--text-muted);">Tráfico + Choques</span>
+            </button>
+            <button class="demo-chip" onclick="selectProfile('Casa')">
+              <strong>Casa</strong>
+              <span style="font-size: 11px; color: var(--text-muted);">Timbre + Alarmas</span>
+            </button>
+            <button class="demo-chip" onclick="selectProfile('Trabajo')">
+              <strong>Trabajo</strong>
+              <span style="font-size: 11px; color: var(--text-muted);">Reuniones</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- Bottom Navigation Bar -->
+    <nav class="bottom-nav">
+      <button class="nav-btn active" id="btn-tab-radar" onclick="switchTab('radar')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg>
+        <span>Radar</span>
+      </button>
+      <button class="nav-btn" id="btn-tab-voice" onclick="switchTab('voice')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line></svg>
+        <span>Voz</span>
+      </button>
+      <button class="nav-btn" id="btn-tab-chat" onclick="switchTab('chat')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+        <span>Hablar</span>
+      </button>
+      <button class="nav-btn" id="btn-tab-settings" onclick="switchTab('settings')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+        <span>Ajustes</span>
+      </button>
+    </nav>
+
+    <!-- FULLSCREEN EMERGENCY TAKEOVER MODAL -->
+    <div class="alert-takeover" id="alertModal">
+      <div class="alert-badge-top" id="alertModalBadge">Prioridad Crítica</div>
+      
+      <div class="alert-main-content">
+        <div class="alert-visual-card">
+          <span style="font-size: 64px;" id="alertModalIcon">🚑</span>
+        </div>
+        <div class="alert-title-text" id="alertModalTitle">Sirena de emergencia</div>
+        <div class="alert-sub-text" id="alertModalSub">Ambulancia o vehículo de rescate en aproximación rápida</div>
+
+        <div class="alert-direction-box">
+          <div class="compass-arrow" id="alertCompassArrow">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="#FFFFFF"><polygon points="12 2 19 21 12 17 5 21 12 2"></polygon></svg>
+          </div>
+          <div style="text-align: left;">
+            <div style="font-size: 11px; opacity: 0.85;">Dirección estimada</div>
+            <div style="font-size: 15px; font-weight: 800;" id="alertDirText">A la izquierda (270°)</div>
+          </div>
+        </div>
+
+        <div class="vibrate-indicator" id="alertVibText">⚡ Patrón: 3 pulsos largos</div>
+      </div>
+
+      <button class="dismiss-alert-btn" onclick="dismissAlert()">Entendido · Silenciar</button>
+    </div>
+
+    <!-- FULLSCREEN BIG TEXT -->
+    <div class="big-text-modal" id="bigTextModal">
+      <div class="big-text-header">
+        <span>Muestra esta pantalla a la otra persona</span>
+        <button onclick="hideBigText()" style="background:none; border:none; color:#FFF; font-size:18px; cursor:pointer;">✕</button>
+      </div>
+      <div class="big-text-body" id="bigTextContent">
+        ¿Me puedes escribir aquí lo que dijiste, por favor?
+      </div>
+      <button class="big-text-close" onclick="hideBigText()">Cerrar pantalla</button>
+    </div>
+  </div>
+
+  <script>
+    // System State
+    const state = {
+      isListening: true,
+      profile: 'Universidad',
+      isPremium: false,
+      fontSize: 16,
+      transcribing: true,
+      audioCtx: null,
+      activeAlerts: {
+        sirena: true,
+        disparo: true,
+        alarma: true,
+        choque: true,
+        nombre: true,
+        grito: true
+      }
+    };
+
+    // Alert Definitions based on the MVP PDF
+    const ALERT_TYPES = {
+      sirena: {
+        title: 'Sirena de emergencia',
+        sub: 'Ambulancia o patrulla policial detectada cerca',
+        prio: 'Crítica',
+        color: '#DC2626',
+        icon: '🚑',
+        dir: 'A la izquierda (270°)',
+        deg: 270,
+        vib: '⚡ 3 pulsos largos continuos',
+        vibPattern: [600, 200, 600, 200, 600],
+        tone: 850
+      },
+      alarma: {
+        title: 'Alarma de incendio / evacuación',
+        sub: 'Señal de evacuación activa en el edificio',
+        prio: 'Crítica',
+        color: '#B91C1C',
+        icon: '🚨',
+        dir: 'En todo el edificio (360°)',
+        deg: 0,
+        vib: '⚡ Pulso continuo sostenido',
+        vibPattern: [1000, 150, 1000],
+        tone: 980
+      },
+      disparo: {
+        title: 'Disparo o detonación',
+        sub: 'Sonido seco de alta intensidad detectado',
+        prio: 'Crítica',
+        color: '#991B1B',
+        icon: '💥',
+        dir: 'Atrás a la derecha (140°)',
+        deg: 140,
+        vib: '⚡ Vibración urgente máxima',
+        vibPattern: [800, 100, 800],
+        tone: 250
+      },
+      choque: {
+        title: 'Accidente o choque vial',
+        sub: 'Impacto fuerte de vehículo en la vía',
+        prio: 'Alta',
+        color: '#D97706',
+        icon: '🚗',
+        dir: 'Al frente a la derecha (45°)',
+        deg: 45,
+        vib: '⚡ Pulsos rápidos intermitentes',
+        vibPattern: [150, 80, 150, 80, 150],
+        tone: 450
+      },
+      nombre: {
+        title: 'Alguien dijo tu nombre',
+        sub: 'Voz cercana pronunció «Daniela»',
+        prio: 'Alta',
+        color: '#2563EB',
+        icon: '🗣',
+        dir: 'Atrás de ti (180°)',
+        deg: 180,
+        vib: '⚡ Doble pulso suave',
+        vibPattern: [200, 120, 200],
+        tone: 600
+      },
+      grito: {
+        title: 'Grito o discusión detectada',
+        sub: 'Voz humana con tono de alarma detectada',
+        prio: 'Alta',
+        color: '#EA580C',
+        icon: '📢',
+        dir: 'A la derecha (90°)',
+        deg: 90,
+        vib: '⚡ 3 pulsos medios',
+        vibPattern: [300, 150, 300, 150, 300],
+        tone: 700
+      }
+    };
+
+    // Profiles
+    const PROFILES = ['Universidad', 'Calle', 'Casa', 'Trabajo'];
+
+    // Clock
+    function updateClock() {
+      const now = new Date();
+      const h = String(now.getHours()).padStart(2, '0');
+      const m = String(now.getMinutes()).padStart(2, '0');
+      document.getElementById('clockDisplay').textContent = `${h}:${m}`;
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    // Sound synth for browser demo
+    function playTone(freq, duration = 300) {
+      try {
+        if (!state.audioCtx) {
+          state.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        if (state.audioCtx.state === 'suspended') {
+          state.audioCtx.resume();
+        }
+        const osc = state.audioCtx.createOscillator();
+        const gain = state.audioCtx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, state.audioCtx.currentTime);
+        gain.gain.setValueAtTime(0.2, state.audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, state.audioCtx.currentTime + (duration / 1000));
+        osc.connect(gain);
+        gain.connect(state.audioCtx.destination);
+        osc.start();
+        osc.stop(state.audioCtx.currentTime + (duration / 1000));
+      } catch (e) {
+        // AudioContext may be blocked before gesture
+      }
+    }
+
+    // Audio Visualizer Simulation
+    function animateAudioMeter() {
+      if (!state.isListening) return;
+      const bars = document.querySelectorAll('.meter-bar');
+      bars.forEach(bar => {
+        const rand = Math.floor(Math.random() * 20) + 6;
+        bar.style.height = `${rand}px`;
+      });
+    }
+    setInterval(animateAudioMeter, 180);
+
+    // Switch Tabs
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-view').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+      
+      const targetView = document.getElementById(`tab-${tabId}`);
+      const targetBtn = document.getElementById(`btn-tab-${tabId}`);
+      if (targetView) targetView.classList.add('active');
+      if (targetBtn) targetBtn.classList.add('active');
+    }
+
+    // Toggle Listening
+    function toggleListening() {
+      state.isListening = !state.isListening;
+      const core = document.getElementById('radarCoreIcon');
+      const title = document.getElementById('listenStateTitle');
+      const sub = document.getElementById('listenStateSub');
+      const lbl = document.getElementById('toggleListenLabel');
+      const icon = document.getElementById('toggleListenIcon');
+
+      if (state.isListening) {
+        core.classList.remove('paused');
+        title.textContent = 'Escuchando entorno';
+        sub.textContent = 'Detectando sirenas, alarmas, choques y mención de tu nombre «Daniela»';
+        lbl.textContent = 'Pausar escucha';
+        icon.textContent = '⏸';
+      } else {
+        core.classList.add('paused');
+        title.textContent = 'Escucha pausada';
+        sub.textContent = 'No se enviarán alertas ni vibraciones mientras esté en pausa.';
+        lbl.textContent = 'Reanudar escucha';
+        icon.textContent = '▶';
+      }
+    }
+
+    // Trigger Alert (Emergency Screen Takeover)
+    function triggerAlert(type) {
+      const alertData = ALERT_TYPES[type];
+      if (!alertData) return;
+
+      // Haptic Vibration if supported on mobile
+      if (navigator.vibrate) {
+        try { navigator.vibrate(alertData.vibPattern); } catch(e){}
+      }
+
+      // Demo sound tone
+      playTone(alertData.tone, 500);
+
+      // Populate Modal
+      const modal = document.getElementById('alertModal');
+      modal.style.background = alertData.color;
+      document.getElementById('alertModalBadge').textContent = `Prioridad ${alertData.prio}`;
+      document.getElementById('alertModalIcon').textContent = alertData.icon;
+      document.getElementById('alertModalTitle').textContent = alertData.title;
+      document.getElementById('alertModalSub').textContent = alertData.sub;
+      document.getElementById('alertDirText').textContent = alertData.dir;
+      document.getElementById('alertVibText').textContent = alertData.vib;
+      document.getElementById('alertCompassArrow').style.transform = `rotate(${alertData.deg}deg)`;
+
+      modal.classList.add('active');
+
+      // Add to event timeline feed
+      prependEvent(alertData);
+    }
+
+    function dismissAlert() {
+      document.getElementById('alertModal').classList.remove('active');
+    }
+
+    function prependEvent(alertData) {
+      const now = new Date();
+      const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+      const container = document.getElementById('eventsContainer');
+      const item = document.createElement('div');
+      item.className = 'event-item';
+      item.innerHTML = `
+        <div class="event-badge" style="background: rgba(37,99,235,0.1); color: ${alertData.color};">${alertData.icon}</div>
+        <div class="event-info">
+          <div class="event-title">${alertData.title}</div>
+          <div class="event-meta">
+            <span>${alertData.dir.split('(')[0]}</span>
+            <span>·</span>
+            <span>Ahora</span>
+          </div>
+        </div>
+        <span class="event-time">${timeStr}</span>
+      `;
+      container.insertBefore(item, container.firstChild);
+    }
+
+    // Transcription Engine
+    function setTranscribeMode(mode) {
+      document.getElementById('modeClassBtn').classList.toggle('active', mode === 'clase');
+      document.getElementById('modeConvBtn').classList.toggle('active', mode === 'conv');
+    }
+
+    function adjustFontSize(delta) {
+      state.fontSize = Math.max(13, Math.min(26, state.fontSize + delta));
+      document.querySelectorAll('.dialogue-text').forEach(el => {
+        el.style.fontSize = `${state.fontSize}px`;
+      });
+    }
+
+    function toggleTranscriptionEngine() {
+      state.transcribing = !state.transcribing;
+      const btn = document.getElementById('toggleTranscribeBtn');
+      const dot = document.getElementById('liveDotIndicator');
+      const txt = document.getElementById('transcribeStatusText');
+      const lbl = document.getElementById('transcribeBtnLabel');
+
+      if (state.transcribing) {
+        btn.classList.remove('active');
+        dot.style.display = 'inline-block';
+        txt.textContent = 'Escuchando en vivo…';
+        lbl.textContent = 'Pausar transcripción';
+      } else {
+        btn.classList.add('active');
+        dot.style.display = 'none';
+        txt.textContent = 'Transcripción en pausa';
+        lbl.textContent = 'Reanudar transcripción';
+      }
+    }
+
+    // Communication & Big Text
+    function showBigText() {
+      const input = document.getElementById('userMsgInput');
+      const val = input.value.trim() || 'Soy una persona sorda. Por favor escribe aquí tu respuesta.';
+      document.getElementById('bigTextContent').textContent = val;
+      document.getElementById('bigTextModal').classList.add('active');
+    }
+
+    function hideBigText() {
+      document.getElementById('bigTextModal').classList.remove('active');
+    }
+
+    function clearMessage() {
+      document.getElementById('userMsgInput').value = '';
+    }
+
+    function usePhrase(text) {
+      document.getElementById('userMsgInput').value = text;
+      showBigText();
+    }
+
+    function triggerSos() {
+      document.getElementById('bigTextContent').textContent = '⚠️ EMERGENCIA: Soy sordo/a. Necesito ayuda inmediata. Ya he compartido mi ubicación con mis contactos y servicios de auxilio.';
+      document.getElementById('bigTextModal').classList.add('active');
+      if (navigator.vibrate) {
+        try { navigator.vibrate([1000, 200, 1000, 200, 1000]); } catch(e){}
+      }
+    }
+
+    // Profiles & Freemium
+    function cycleProfile() {
+      const currentIdx = PROFILES.indexOf(state.profile);
+      const nextIdx = (currentIdx + 1) % PROFILES.length;
+      selectProfile(PROFILES[nextIdx]);
+    }
+
+    function selectProfile(name) {
+      state.profile = name;
+      document.getElementById('activeProfileLabel').textContent = name;
+    }
+
+    function toggleTier() {
+      state.isPremium = !state.isPremium;
+      const title = document.getElementById('tierCardTitle');
+      const badge = document.getElementById('tierCardBadge');
+      const btn = document.getElementById('upgradeToggleBtn');
+      const list = document.getElementById('tierFeatureList');
+
+      if (state.isPremium) {
+        title.textContent = 'Plan Premium Activo';
+        badge.textContent = 'Licencia Campus / Pro';
+        badge.style.background = 'rgba(16, 185, 129, 0.2)';
+        badge.style.color = '#34D399';
+        badge.style.borderColor = 'rgba(16, 185, 129, 0.4)';
+        btn.textContent = 'Volver a Plan Gratuito (Demo)';
+        list.innerHTML = `
+          <li>✓ Transcripción ilimitada en la nube</li>
+          <li>✓ Historial completo y búsqueda</li>
+          <li>✓ Perfiles ilimitados (Casa, Campus, Trabajo, Calle)</li>
+          <li>✓ Patrones y sonidos de vibración personalizados</li>
+          <li>✓ Integración futura con Smartwatch</li>
+        `;
+      } else {
+        title.textContent = 'Plan Gratuito';
+        badge.textContent = 'Esencial Activo';
+        badge.style.background = 'rgba(245, 158, 11, 0.2)';
+        badge.style.color = '#FBBF24';
+        badge.style.borderColor = 'rgba(245, 158, 11, 0.4)';
+        btn.textContent = 'Probar funciones Premium';
+        list.innerHTML = `
+          <li>✓ Alertas críticas (sirenas, disparos, alarmas)</li>
+          <li>✓ Detección de nombre («Daniela»)</li>
+          <li>✓ Transcripción básica de aula</li>
+          <li>✓ Vibración háptica en móvil</li>
+        `;
+      }
+    }
+
+    function toggleAlertState(key) {
+      state.activeAlerts[key] = !state.activeAlerts[key];
+    }
+  </script>
+</body>
+</html>

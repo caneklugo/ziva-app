@@ -1,0 +1,834 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Señal · prototipo de app de accesibilidad auditiva</title>
+<script src="./vendor/react.js"></script>
+<script src="./vendor/react-dom.js"></script>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&amp;display=swap">
+<style>
+body{margin:0;background:#E4E7EC}
+a{color:#1D4ED8}a:hover{color:#1E3A8A}
+button{font-family:inherit;cursor:pointer}
+textarea{font-family:inherit}
+@keyframes ring{0%{transform:scale(1);opacity:.55}100%{transform:scale(1.9);opacity:0}}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
+@keyframes flash{0%,100%{opacity:1}50%{opacity:.35}}
+.pulse{animation:ring 1.6s ease-out infinite}
+.shake{animation:shake .5s ease-in-out 3}
+.flash{animation:flash .8s ease-in-out infinite}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; position: relative; overflow: hidden; display: flex; flex-direction: column; background: #F4F6F8; color: #0F1B2D; font-family: 'Atkinson Hyperlegible', 'Segoe UI', sans-serif; border-radius: 28px;">
+
+<!-- ============ BIENVENIDA ============ -->
+<sc-if value="{{isOnboarding}}" hint-placeholder-val="{{true}}">
+<div style="flex: 1; overflow-y: auto; padding: 32px 24px 24px; display: flex; flex-direction: column; gap: 22px;">
+  <div style="display: flex; align-items: center; gap: 12px;">
+    <div style="width: 48px; height: 48px; border-radius: 14px; background: #1D4ED8; display: flex; align-items: center; justify-content: center;">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12h3l2-6 4 12 3-9 2 3h6"></path></svg>
+    </div>
+    <div>
+      <div style="font-size: 26px; font-weight: 700;">Señal</div>
+      <div style="font-size: 14px; color: #475467;">Nombre provisional</div>
+    </div>
+  </div>
+  <div>
+    <h1 style="margin: 0 0 6px; font-size: 24px; line-height: 1.25;">Configuremos la app para ti</h1>
+    <p style="margin: 0; font-size: 16px; color: #475467; line-height: 1.45;">Tres preguntas para ajustar alertas, textos y vibraciones a tu forma de comunicarte.</p>
+  </div>
+  <div style="display: flex; flex-direction: column; gap: 10px;">
+    <div style="font-size: 17px; font-weight: 700;">1. ¿Cómo te comunicas principalmente?</div>
+    <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+      <sc-for list="{{obCom}}" as="c" hint-placeholder-count="3">
+        <button type="button" onClick="{{c.pick}}" aria-pressed="{{c.on}}" style="min-height: 44px; padding: 0 16px; border-radius: 22px; font-size: 16px; border: 2px solid {{c.bd}}; background: {{c.bg}}; color: {{c.fg}};">{{c.label}}</button>
+      </sc-for>
+    </div>
+  </div>
+  <div style="display: flex; flex-direction: column; gap: 10px;">
+    <div style="font-size: 17px; font-weight: 700;">2. ¿Qué grado de pérdida auditiva tienes?</div>
+    <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+      <sc-for list="{{obGrado}}" as="c" hint-placeholder-count="4">
+        <button type="button" onClick="{{c.pick}}" aria-pressed="{{c.on}}" style="min-height: 44px; padding: 0 16px; border-radius: 22px; font-size: 16px; border: 2px solid {{c.bd}}; background: {{c.bg}}; color: {{c.fg}};">{{c.label}}</button>
+      </sc-for>
+    </div>
+  </div>
+  <div style="display: flex; flex-direction: column; gap: 10px;">
+    <div style="font-size: 17px; font-weight: 700;">3. ¿Dónde la usarás más?</div>
+    <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+      <sc-for list="{{obUso}}" as="c" hint-placeholder-count="4">
+        <button type="button" onClick="{{c.pick}}" aria-pressed="{{c.on}}" style="min-height: 44px; padding: 0 16px; border-radius: 22px; font-size: 16px; border: 2px solid {{c.bd}}; background: {{c.bg}}; color: {{c.fg}};">{{c.label}}</button>
+      </sc-for>
+    </div>
+  </div>
+  <div style="margin-top: auto; display: flex; flex-direction: column; gap: 10px;">
+    <button type="button" onClick="{{finishOnboarding}}" style="min-height: 56px; border: none; border-radius: 16px; background: #1D4ED8; color: #FFFFFF; font-size: 18px; font-weight: 700;">Empezar</button>
+    <p style="margin: 0; font-size: 13px; color: #475467; text-align: center;">Las alertas de seguridad siempre son gratis.</p>
+  </div>
+</div>
+</sc-if>
+
+<!-- ============ APP ============ -->
+<sc-if value="{{isApp}}" hint-placeholder-val="{{false}}">
+<div style="display: flex; flex-direction: column; flex: 1; min-height: 0;">
+  <div style="padding: 20px 20px 12px; display: flex; align-items: center; justify-content: space-between; gap: 12px; background: #FFFFFF; border-bottom: 1px solid #D0D5DD;">
+    <div style="display: flex; align-items: center; gap: 10px;">
+      <div style="width: 36px; height: 36px; border-radius: 10px; background: #1D4ED8; display: flex; align-items: center; justify-content: center;">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12h3l2-6 4 12 3-9 2 3h6"></path></svg>
+      </div>
+      <div style="font-size: 21px; font-weight: 700;">{{screenTitle}}</div>
+    </div>
+    <div style="display: flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 16px; background: #EEF2FF; color: #1E3A8A; font-size: 14px; font-weight: 700;">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c0-4 4-6 8-6s8 2 8 6"></path></svg>
+      <span>{{profile}}</span>
+      <sc-if value="{{premium}}" hint-placeholder-val="{{false}}"><span style="color: #B45309;">· Premium</span></sc-if>
+    </div>
+  </div>
+
+  <div style="flex: 1; overflow-y: auto; padding: 18px 20px 24px;">
+
+    <!-- ---------- INICIO ---------- -->
+    <sc-if value="{{isInicio}}" hint-placeholder-val="{{true}}">
+    <div style="display: flex; flex-direction: column; gap: 18px;">
+      <div style="background: {{statusBg}}; color: #FFFFFF; border-radius: 20px; padding: 20px; display: flex; align-items: center; gap: 18px;">
+        <div style="position: relative; width: 64px; height: 64px; flex-shrink: 0;">
+          <sc-if value="{{listening}}" hint-placeholder-val="{{true}}">
+            <div class="pulse" style="position: absolute; inset: 0; border-radius: 50%; background: #FFFFFF;"></div>
+          </sc-if>
+          <div style="position: absolute; inset: 0; border-radius: 50%; background: rgba(255,255,255,.18); display: flex; align-items: center; justify-content: center;">
+            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"></rect><path d="M5 11a7 7 0 0 0 14 0"></path><path d="M12 18v3"></path></svg>
+          </div>
+        </div>
+        <div style="flex: 1;">
+          <div style="font-size: 20px; font-weight: 700;">{{statusTitle}}</div>
+          <div style="font-size: 15px; opacity: .92; margin-top: 2px;">{{statusSub}}</div>
+        </div>
+        <button type="button" onClick="{{toggleListening}}" aria-label="{{listenAria}}" style="min-width: 44px; min-height: 44px; border-radius: 22px; border: 2px solid #FFFFFF; background: transparent; color: #FFFFFF; font-size: 14px; font-weight: 700; padding: 0 12px;">{{listenBtn}}</button>
+      </div>
+
+      <div>
+        <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 10px;">
+          <h2 style="margin: 0; font-size: 18px;">Probar alertas</h2>
+          <span style="font-size: 13px; color: #475467;">Demo: simula un sonido</span>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px;">
+          <sc-for list="{{demoButtons}}" as="d" hint-placeholder-count="6">
+            <button type="button" onClick="{{d.fire}}" style="min-height: 84px; border-radius: 16px; border: 2px solid {{d.bd}}; background: #FFFFFF; color: {{d.fg}}; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; font-size: 15px; font-weight: 700; padding: 8px 4px;">
+              <span style="width: 14px; height: 14px; border-radius: 50%; background: {{d.dot}};"></span>
+              <span>{{d.label}}</span>
+              <span style="font-size: 12px; font-weight: 400; color: #475467;">{{d.state}}</span>
+            </button>
+          </sc-for>
+        </div>
+      </div>
+
+      <div>
+        <h2 style="margin: 0 0 10px; font-size: 18px;">Últimas alertas</h2>
+        <sc-if value="{{noHistory}}" hint-placeholder-val="{{true}}">
+          <div style="padding: 16px; border-radius: 14px; background: #FFFFFF; border: 1px dashed #98A2B3; font-size: 15px; color: #475467;">Aún no hay alertas. Prueba una arriba.</div>
+        </sc-if>
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+          <sc-for list="{{history}}" as="h" hint-placeholder-count="2">
+            <div style="display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 14px; background: #FFFFFF; border: 1px solid #D0D5DD;">
+              <span style="width: 12px; height: 12px; border-radius: 50%; background: {{h.color}}; flex-shrink: 0;"></span>
+              <div style="flex: 1;">
+                <div style="font-size: 16px; font-weight: 700;">{{h.title}}</div>
+                <div style="font-size: 13px; color: #475467;">{{h.dir}}</div>
+              </div>
+              <span style="font-size: 13px; color: #475467;">{{h.time}}</span>
+            </div>
+          </sc-for>
+        </div>
+        <sc-if value="{{historyLocked}}" hint-placeholder-val="{{false}}">
+          <div style="margin-top: 8px; font-size: 13px; color: #475467;">Gratis: últimas 3 alertas · Historial completo en Premium</div>
+        </sc-if>
+      </div>
+    </div>
+    </sc-if>
+
+    <!-- ---------- TRANSCRIBIR ---------- -->
+    <sc-if value="{{isTranscribir}}" hint-placeholder-val="{{false}}">
+    <div style="display: flex; flex-direction: column; gap: 14px;">
+      <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; padding: 4px; border-radius: 14px; background: #E4E7EC;">
+        <sc-for list="{{modes}}" as="m" hint-placeholder-count="2">
+          <button type="button" onClick="{{m.pick}}" aria-pressed="{{m.on}}" style="min-height: 44px; border-radius: 10px; border: none; font-size: 15px; font-weight: 700; background: {{m.bg}}; color: {{m.fg}};">{{m.label}}</button>
+        </sc-for>
+      </div>
+      <div style="display: flex; align-items: center; gap: 10px; padding: 12px 14px; border-radius: 14px; background: #FFFFFF; border: 1px solid #D0D5DD;">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1D4ED8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"></rect><path d="M5 11a7 7 0 0 0 14 0"></path><path d="M12 18v3"></path></svg>
+        <div style="flex: 1;">
+          <div style="font-size: 15px; font-weight: 700;">{{micLabel}}</div>
+          <div style="font-size: 13px; color: #475467;">{{micHint}}</div>
+        </div>
+      </div>
+      <div style="display: flex; gap: 8px;">
+        <button type="button" onClick="{{toggleTranscribe}}" style="flex: 1; min-height: 52px; border-radius: 14px; border: none; background: {{trBtnBg}}; color: #FFFFFF; font-size: 17px; font-weight: 700;">{{trBtn}}</button>
+        <button type="button" onClick="{{fontDown}}" aria-label="Texto más chico" style="width: 52px; min-height: 52px; border-radius: 14px; border: 2px solid #D0D5DD; background: #FFFFFF; color: #0F1B2D; font-size: 15px; font-weight: 700;">A−</button>
+        <button type="button" onClick="{{fontUp}}" aria-label="Texto más grande" style="width: 52px; min-height: 52px; border-radius: 14px; border: 2px solid #D0D5DD; background: #FFFFFF; color: #0F1B2D; font-size: 19px; font-weight: 700;">A+</button>
+      </div>
+      <div style="min-height: 300px; border-radius: 16px; background: #0F1B2D; color: #FFFFFF; padding: 16px; display: flex; flex-direction: column; gap: 12px;">
+        <sc-if value="{{noLines}}" hint-placeholder-val="{{true}}">
+          <div style="font-size: 16px; color: #CBD5E1; line-height: 1.5;">Pulsa «Empezar a transcribir». Las palabras aparecerán aquí en tiempo real y se resaltará cuando digan tu nombre.</div>
+        </sc-if>
+        <sc-for list="{{lines}}" as="l" hint-placeholder-count="3">
+          <div style="border-radius: 10px; padding: {{l.pad}}; background: {{l.bg}};">
+            <div style="font-size: 13px; font-weight: 700; color: {{l.whoColor}}; margin-bottom: 2px;">{{l.who}}</div>
+            <div style="font-size: {{fontPx}}; line-height: 1.4; color: {{l.fg}};">{{l.text}}</div>
+          </div>
+        </sc-for>
+        <sc-if value="{{transcribing}}" hint-placeholder-val="{{false}}">
+          <div class="flash" style="font-size: 14px; color: #93C5FD;">Escuchando…</div>
+        </sc-if>
+      </div>
+      <button type="button" onClick="{{saveTranscript}}" style="min-height: 48px; border-radius: 14px; border: 2px solid #D0D5DD; background: #FFFFFF; color: #0F1B2D; font-size: 15px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px;">
+        <sc-if value="{{notPremium}}" hint-placeholder-val="{{true}}">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#B45309" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2"></rect><path d="M8 11V7a4 4 0 0 1 8 0v4"></path></svg>
+        </sc-if>
+        <span>{{saveLabel}}</span>
+      </button>
+    </div>
+    </sc-if>
+
+    <!-- ---------- COMUNICAR ---------- -->
+    <sc-if value="{{isComunicar}}" hint-placeholder-val="{{false}}">
+    <div style="display: flex; flex-direction: column; gap: 14px;">
+      <label for="msg" style="font-size: 17px; font-weight: 700;">Escribe lo que quieres decir</label>
+      <textarea id="msg" value="{{text}}" onChange="{{onText}}" rows="3" placeholder="Ej. ¿Me puede escribir la dirección?" style="width: 100%; box-sizing: border-box; border-radius: 14px; border: 2px solid #98A2B3; padding: 14px; font-size: 18px; resize: none; color: #0F1B2D; background: #FFFFFF;"></textarea>
+      <div style="display: flex; gap: 8px;">
+        <button type="button" onClick="{{showBig}}" style="flex: 1; min-height: 52px; border-radius: 14px; border: none; background: #1D4ED8; color: #FFFFFF; font-size: 17px; font-weight: 700;">Mostrar en grande</button>
+        <button type="button" onClick="{{clearText}}" style="min-height: 52px; padding: 0 16px; border-radius: 14px; border: 2px solid #D0D5DD; background: #FFFFFF; color: #0F1B2D; font-size: 15px; font-weight: 700;">Borrar</button>
+      </div>
+      <h2 style="margin: 8px 0 0; font-size: 18px;">Frases rápidas</h2>
+      <div style="display: flex; flex-direction: column; gap: 8px;">
+        <sc-for list="{{phrases}}" as="p" hint-placeholder-count="5">
+          <button type="button" onClick="{{p.pick}}" style="min-height: 52px; text-align: left; padding: 10px 14px; border-radius: 14px; border: 1px solid #D0D5DD; background: #FFFFFF; color: #0F1B2D; font-size: 16px; display: flex; align-items: center; gap: 12px;">
+            <span style="width: 32px; height: 32px; border-radius: 8px; background: {{p.tint}}; color: {{p.ink}}; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; flex-shrink: 0;">{{p.tag}}</span>
+            <span>{{p.text}}</span>
+          </button>
+        </sc-for>
+      </div>
+      <button type="button" onClick="{{sos}}" style="min-height: 56px; border-radius: 14px; border: none; background: #B42318; color: #FFFFFF; font-size: 17px; font-weight: 700;">Necesito ayuda · enviar ubicación</button>
+    </div>
+    </sc-if>
+
+    <!-- ---------- LEER ---------- -->
+    <sc-if value="{{isLeer}}" hint-placeholder-val="{{false}}">
+    <div style="display: flex; flex-direction: column; gap: 16px;">
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <div>
+          <div style="font-size: 13px; color: #475467; font-weight: 700;">NIVEL 3 · FRASES</div>
+          <h2 style="margin: 2px 0 0; font-size: 19px;">Frase del día</h2>
+        </div>
+        <span style="padding: 6px 10px; border-radius: 12px; background: #ECFDF3; color: #065F46; font-size: 13px; font-weight: 700;">Lección 12 de 40</span>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; padding: 4px; border-radius: 14px; background: #E4E7EC;">
+        <sc-for list="{{readViews}}" as="v" hint-placeholder-count="3">
+          <button type="button" onClick="{{v.pick}}" aria-pressed="{{v.on}}" style="min-height: 44px; border-radius: 10px; border: none; font-size: 14px; font-weight: 700; background: {{v.bg}}; color: {{v.fg}};">{{v.label}}</button>
+        </sc-for>
+      </div>
+
+      <sc-if value="{{rvTexto}}" hint-placeholder-val="{{true}}">
+      <div style="display: flex; flex-direction: column; gap: 12px;">
+        <div style="padding: 18px; border-radius: 16px; background: #FFFFFF; border: 1px solid #D0D5DD;">
+          <div style="display: flex; flex-wrap: wrap; gap: 4px 6px; font-size: 21px; line-height: 1.5;">
+            <sc-for list="{{tokens}}" as="w" hint-placeholder-count="12">
+              <sc-if value="{{w.isKey}}" hint-placeholder-val="{{false}}">
+                <button type="button" onClick="{{w.pick}}" aria-pressed="{{w.on}}" style="border: none; padding: 0 4px; border-radius: 6px; font-size: 21px; font-weight: 700; background: {{w.bg}}; color: {{w.fg}}; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 4px;">{{w.text}}</button>
+              </sc-if>
+              <sc-if value="{{w.plain}}" hint-placeholder-val="{{true}}">
+                <span>{{w.text}}</span>
+              </sc-if>
+            </sc-for>
+          </div>
+          <div style="margin-top: 10px; font-size: 13px; color: #475467;">Toca las palabras subrayadas para ver su seña, imagen y significado.</div>
+        </div>
+
+        <sc-if value="{{hasWord}}" hint-placeholder-val="{{false}}">
+        <div style="padding: 16px; border-radius: 16px; background: #FFFFFF; border: 2px solid #1D4ED8; display: flex; flex-direction: column; gap: 12px;">
+          <div style="display: flex; gap: 12px;">
+            <div style="width: 116px; height: 116px; flex-shrink: 0; border-radius: 12px; background: #0F1B2D; color: #CBD5E1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; text-align: center; font-size: 12px; padding: 6px; box-sizing: border-box;">
+              <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 13V5a1.5 1.5 0 0 1 3 0v6"></path><path d="M11 11V4a1.5 1.5 0 0 1 3 0v7"></path><path d="M14 11V5.5a1.5 1.5 0 0 1 3 0V14a6 6 0 0 1-6 6h-1a6 6 0 0 1-5-2.7L3 14a1.5 1.5 0 0 1 2.5-1.6L8 15"></path></svg>
+              <span>Video: seña de «{{word.base}}»</span>
+            </div>
+            <div style="flex: 1; display: flex; flex-direction: column; gap: 6px;">
+              <div style="font-size: 26px; font-weight: 700;">{{word.base}}</div>
+              <div style="font-size: 15px; color: #475467;">Sílabas: <b style="color: #0F1B2D;">{{word.syl}}</b></div>
+              <div style="display: flex; align-items: center; gap: 8px; padding: 8px; border-radius: 10px; background: #F4F6F8;">
+                <sc-if value="{{word.iFlower}}" hint-placeholder-val="{{false}}"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#B42318" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 10c-2 0-4-1.5-4-4 2 0 3 .5 4 2 1-1.5 2-2 4-2 0 2.5-2 4-4 4z"></path><path d="M12 10v11"></path><path d="M12 15c-2-2-4-2-5-1M12 17c2-2 4-2 5-1"></path></svg></sc-if>
+                <sc-if value="{{word.iCloud}}" hint-placeholder-val="{{false}}"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#1D4ED8" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 18h10a4 4 0 0 0 .5-8 5.5 5.5 0 0 0-10.6 1.5A3.3 3.3 0 0 0 7 18z"></path><path d="M12 8l.6 1.4 1.4.1-1.1.9.4 1.4-1.3-.8-1.3.8.4-1.4-1.1-.9 1.4-.1z"></path></svg></sc-if>
+                <sc-if value="{{word.iOther}}" hint-placeholder-val="{{true}}"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#475467" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"></rect><circle cx="9" cy="10" r="2"></circle><path d="M21 17l-5-5-9 8"></path></svg></sc-if>
+                <span style="font-size: 13px; color: #475467;">{{word.pic}}</span>
+              </div>
+            </div>
+          </div>
+          <div style="font-size: 16px; line-height: 1.45;">{{word.mean}}</div>
+          <sc-if value="{{word.hasNote}}" hint-placeholder-val="{{false}}">
+            <div style="padding: 10px 12px; border-radius: 10px; background: #FEF3C7; color: #78350F; font-size: 14px; line-height: 1.4;">{{word.note}}</div>
+          </sc-if>
+          <div>
+            <div style="font-size: 13px; color: #475467; margin-bottom: 6px;">Deletrear con dactilología</div>
+            <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+              <sc-for list="{{word.letters}}" as="ch" hint-placeholder-count="5">
+                <span style="width: 34px; height: 40px; border-radius: 8px; border: 2px solid #1D4ED8; display: flex; align-items: center; justify-content: center; font-size: 17px; font-weight: 700; color: #1D4ED8;">{{ch.c}}</span>
+              </sc-for>
+            </div>
+          </div>
+        </div>
+        </sc-if>
+      </div>
+      </sc-if>
+
+      <sc-if value="{{rvLsm}}" hint-placeholder-val="{{false}}">
+      <div style="display: flex; flex-direction: column; gap: 12px;">
+        <div style="height: 220px; border-radius: 16px; background: #0F1B2D; color: #CBD5E1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; text-align: center; padding: 16px; box-sizing: border-box;">
+          <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="6" r="3"></circle><path d="M6 21v-4a6 6 0 0 1 12 0v4"></path><path d="M4 12l3 2M20 12l-3 2"></path></svg>
+          <div style="font-size: 16px; font-weight: 700; color: #FFFFFF;">Intérprete sordo/a señando la frase</div>
+          <div style="font-size: 13px;">Video grabado con aliados · subtítulo sincronizado</div>
+        </div>
+        <div style="padding: 14px; border-radius: 14px; background: #FFFFFF; border: 1px solid #D0D5DD;">
+          <div style="font-size: 13px; color: #475467; font-weight: 700; margin-bottom: 6px;">GLOSA LSM (orden de las señas)</div>
+          <div style="font-size: 17px; font-weight: 700; line-height: 1.5; letter-spacing: .02em;">ROSA UNA TÚ PICAR. ROSAS TODAS ODIAR ¿POR QUÉ? LOCO.</div>
+          <div style="font-size: 17px; font-weight: 700; line-height: 1.5; letter-spacing: .02em; margin-top: 6px;">SUEÑO UNO CUMPLIR NO. SUEÑOS TODOS DEJAR ¿POR QUÉ? NO.</div>
+          <div style="margin-top: 8px; font-size: 13px; color: #B45309;">Aproximación para el prototipo. Debe validarla un intérprete sordo.</div>
+        </div>
+        <div style="padding: 12px 14px; border-radius: 14px; background: #EEF2FF; color: #1E3A8A; font-size: 14px; line-height: 1.45;">La LSM tiene su propia gramática: primero el tema, luego el comentario, y la negación al final. Por eso no se traduce palabra por palabra.</div>
+      </div>
+      </sc-if>
+
+      <sc-if value="{{rvFacil}}" hint-placeholder-val="{{false}}">
+      <div style="display: flex; flex-direction: column; gap: 10px;">
+        <div style="font-size: 13px; color: #475467; font-weight: 700;">LA MISMA IDEA EN ESPAÑOL FÁCIL</div>
+        <div style="padding: 16px; border-radius: 16px; background: #FFFFFF; border: 1px solid #D0D5DD; font-size: 20px; line-height: 1.5;">Una rosa te lastimó.<br>No odies todas las rosas.</div>
+        <div style="padding: 16px; border-radius: 16px; background: #FFFFFF; border: 1px solid #D0D5DD; font-size: 20px; line-height: 1.5;">Un sueño no se hizo realidad.<br>No dejes todos tus sueños.</div>
+        <div style="font-size: 13px; color: #475467;">Frases cortas, una idea por línea. Después se pasa a la frase original.</div>
+      </div>
+      </sc-if>
+
+      <sc-if value="{{rvDeletrear}}" hint-placeholder-val="{{false}}">
+      <div style="display: flex; flex-direction: column; gap: 12px;">
+        <div style="font-size: 15px; line-height: 1.45;">Mira las señas de cada figura y escribe la letra debajo de cada una.</div>
+        <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; padding: 4px; border-radius: 14px; background: #E4E7EC;">
+          <sc-for list="{{spellModes}}" as="m" hint-placeholder-count="2">
+            <button type="button" onClick="{{m.pick}}" aria-pressed="{{m.on}}" style="min-height: 44px; border-radius: 10px; border: none; font-size: 14px; font-weight: 700; background: {{m.bg}}; color: {{m.fg}};">{{m.label}}</button>
+          </sc-for>
+        </div>
+        <sc-for list="{{spellRows}}" as="r" hint-placeholder-count="4">
+          <div style="padding: 12px; border-radius: 16px; background: #FFFFFF; border: 2px solid {{r.cardBd}}; display: flex; flex-direction: column; gap: 10px;">
+            <div style="display: flex; align-items: center; gap: 12px;">
+              <div style="width: 56px; height: 56px; border-radius: 10px; border: 1px solid #D0D5DD; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                <sc-if value="{{r.sq}}" hint-placeholder-val="{{false}}"><svg width="40" height="40" viewBox="0 0 40 40"><rect x="4" y="4" width="32" height="32" fill="#0891B2"></rect></svg></sc-if>
+                <sc-if value="{{r.ci}}" hint-placeholder-val="{{false}}"><svg width="40" height="40" viewBox="0 0 40 40"><circle cx="20" cy="20" r="17" fill="#DB2777"></circle></svg></sc-if>
+                <sc-if value="{{r.tr}}" hint-placeholder-val="{{false}}"><svg width="40" height="40" viewBox="0 0 40 40"><path d="M20 4 L37 35 L3 35 Z" fill="#16A34A"></path></svg></sc-if>
+                <sc-if value="{{r.ro}}" hint-placeholder-val="{{false}}"><svg width="40" height="40" viewBox="0 0 40 40"><path d="M20 2 L33 20 L20 38 L7 20 Z" fill="#3B4BA0"></path></svg></sc-if>
+              </div>
+              <div style="flex: 1;">
+                <div style="font-size: 15px; font-weight: 700;">{{r.title}}</div>
+                <div style="font-size: 13px; color: #475467;">{{r.count}} letras</div>
+              </div>
+              <sc-if value="{{r.showResult}}" hint-placeholder-val="{{false}}">
+                <span style="font-size: 13px; font-weight: 700; padding: 4px 10px; border-radius: 10px; background: {{r.resBg}}; color: {{r.resFg}};">{{r.resLabel}}</span>
+              </sc-if>
+            </div>
+            <div style="display: flex; gap: 3px; flex-wrap: nowrap;">
+              <sc-for list="{{r.cells}}" as="c" hint-placeholder-count="8">
+                <div style="width: 32px; display: flex; flex-direction: column; gap: 4px; align-items: center;">
+                  <div title="Seña {{c.num}}" style="width: 32px; height: 40px; border-radius: 6px; background: #F4F6F8; border: 1px solid #D0D5DD; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                    <svg width="20" height="22" viewBox="0 0 24 24" fill="none" stroke="#344054" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 13V5a1.5 1.5 0 0 1 3 0v6"></path><path d="M11 11V4a1.5 1.5 0 0 1 3 0v7"></path><path d="M14 11V5.5a1.5 1.5 0 0 1 3 0V14a6 6 0 0 1-6 6h-1a6 6 0 0 1-5-2.7L3 14a1.5 1.5 0 0 1 2.5-1.6L8 15"></path></svg>
+                  </div>
+                  <input type="text" maxlength="1" aria-label="{{c.aria}}" value="{{c.val}}" readOnly="{{c.ro}}" onChange="{{c.onChange}}" style="width: 32px; height: 40px; box-sizing: border-box; border-radius: 6px; border: 2px solid {{c.bd}}; background: {{c.bg}}; text-align: center; font-family: inherit; font-size: 18px; font-weight: 700; color: #0F1B2D; padding: 0; text-transform: uppercase;">
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </sc-for>
+        <sc-if value="{{spellPractice}}" hint-placeholder-val="{{true}}">
+          <div style="display: flex; gap: 8px;">
+            <button type="button" onClick="{{checkSpell}}" style="flex: 1; min-height: 52px; border-radius: 14px; border: none; background: #1D4ED8; color: #FFFFFF; font-size: 17px; font-weight: 700;">Revisar</button>
+            <button type="button" onClick="{{resetSpell}}" style="min-height: 52px; padding: 0 16px; border-radius: 14px; border: 2px solid #D0D5DD; background: #FFFFFF; color: #0F1B2D; font-size: 15px; font-weight: 700;">Borrar</button>
+          </div>
+        </sc-if>
+        <sc-if value="{{spellChecked}}" hint-placeholder-val="{{false}}">
+          <div style="font-size: 16px; font-weight: 700; color: {{spellScoreColor}};">{{spellScore}}</div>
+        </sc-if>
+        <div style="padding: 12px 14px; border-radius: 14px; background: #FEF3C7; color: #78350F; font-size: 13px; line-height: 1.45;">Las manitas son de ejemplo. En la app real cada casilla lleva la seña de su letra del alfabeto LSM, dibujada o fotografiada con un aliado sordo.</div>
+      </div>
+      </sc-if>
+
+      <sc-if value="{{notDeletrear}}" hint-placeholder-val="{{true}}">
+      <div style="padding: 16px; border-radius: 16px; background: #FFFFFF; border: 1px solid #D0D5DD; display: flex; flex-direction: column; gap: 10px;">
+        <div style="font-size: 17px; font-weight: 700;">¿Qué quiere decir la frase?</div>
+        <sc-for list="{{quiz}}" as="q" hint-placeholder-count="3">
+          <button type="button" onClick="{{q.pick}}" style="min-height: 48px; text-align: left; padding: 10px 14px; border-radius: 12px; border: 2px solid {{q.bd}}; background: {{q.bg}}; color: #0F1B2D; font-size: 15px;">{{q.text}}</button>
+        </sc-for>
+        <sc-if value="{{quizDone}}" hint-placeholder-val="{{false}}">
+          <div style="font-size: 15px; font-weight: 700; color: {{quizColor}};">{{quizMsg}}</div>
+        </sc-if>
+      </div>
+      </sc-if>
+    </div>
+    </sc-if>
+
+    <!-- ---------- AJUSTES ---------- -->
+    <sc-if value="{{isAjustes}}" hint-placeholder-val="{{false}}">
+    <div style="display: flex; flex-direction: column; gap: 22px;">
+      <sc-if value="{{upsell}}" hint-placeholder-val="{{false}}">
+        <div style="padding: 12px 14px; border-radius: 14px; background: #FEF3C7; color: #78350F; font-size: 15px; font-weight: 700;">Esta función es Premium. Actívala abajo para probarla.</div>
+      </sc-if>
+
+      <div>
+        <h2 style="margin: 0 0 4px; font-size: 18px;">Perfiles</h2>
+        <div style="font-size: 13px; color: #475467; margin-bottom: 10px;">Cada lugar tiene sus propias alertas. Gratis: 2 perfiles.</div>
+        <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px;">
+          <sc-for list="{{profiles}}" as="p" hint-placeholder-count="4">
+            <button type="button" onClick="{{p.pick}}" aria-pressed="{{p.on}}" style="min-height: 48px; border-radius: 14px; border: 2px solid {{p.bd}}; background: {{p.bg}}; color: {{p.fg}}; font-size: 16px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 6px;">
+              <sc-if value="{{p.locked}}" hint-placeholder-val="{{false}}">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#B45309" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2"></rect><path d="M8 11V7a4 4 0 0 1 8 0v4"></path></svg>
+              </sc-if>
+              <span>{{p.label}}</span>
+            </button>
+          </sc-for>
+        </div>
+      </div>
+
+      <div>
+        <h2 style="margin: 0 0 10px; font-size: 18px;">Alertas de este perfil</h2>
+        <div style="display: flex; flex-direction: column; border-radius: 16px; background: #FFFFFF; border: 1px solid #D0D5DD; overflow: hidden;">
+          <sc-for list="{{alertToggles}}" as="t" hint-placeholder-count="6">
+            <div style="display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-bottom: 1px solid #EAECF0;">
+              <span style="width: 12px; height: 12px; border-radius: 50%; background: {{t.color}}; flex-shrink: 0;"></span>
+              <div style="flex: 1;">
+                <div style="font-size: 16px; font-weight: 700;">{{t.label}}</div>
+                <div style="font-size: 13px; color: #475467;">Prioridad {{t.prio}} · {{t.vib}}</div>
+              </div>
+              <button type="button" onClick="{{t.toggle}}" aria-pressed="{{t.on}}" aria-label="Activar {{t.label}}" style="width: 56px; height: 32px; border-radius: 16px; border: none; background: {{t.track}}; position: relative; padding: 0;">
+                <span style="position: absolute; top: 4px; left: {{t.knob}}; width: 24px; height: 24px; border-radius: 50%; background: #FFFFFF;"></span>
+              </button>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+
+      <div>
+        <h2 style="margin: 0 0 4px; font-size: 18px;">Dispositivos</h2>
+        <div style="font-size: 13px; color: #475467; margin-bottom: 10px;">Funciona solo con el celular. Los accesorios mejoran la experiencia.</div>
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+          <sc-for list="{{devices}}" as="d" hint-placeholder-count="4">
+            <div style="display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 14px; background: #FFFFFF; border: 1px solid #D0D5DD;">
+              <div style="flex: 1;">
+                <div style="font-size: 16px; font-weight: 700;">{{d.label}}</div>
+                <div style="font-size: 13px; color: #475467;">{{d.sub}}</div>
+              </div>
+              <button type="button" onClick="{{d.toggle}}" style="min-height: 40px; padding: 0 12px; border-radius: 12px; border: 2px solid {{d.bd}}; background: {{d.bg}}; color: {{d.fg}}; font-size: 14px; font-weight: 700;">{{d.btn}}</button>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+
+      <div>
+        <h2 style="margin: 0 0 10px; font-size: 18px;">Tu plan</h2>
+        <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px;">
+          <div style="padding: 14px; border-radius: 16px; background: #FFFFFF; border: 2px solid {{freeBd}};">
+            <div style="font-size: 17px; font-weight: 700;">Gratis</div>
+            <div style="font-size: 13px; color: #475467; margin-bottom: 8px;">Siempre</div>
+            <div style="font-size: 13px; line-height: 1.6;">Alertas de seguridad<br>Detección del nombre<br>Transcripción básica<br>Mensajes en pantalla<br>2 perfiles</div>
+          </div>
+          <div style="padding: 14px; border-radius: 16px; background: #FFFBEB; border: 2px solid {{premBd}};">
+            <div style="font-size: 17px; font-weight: 700; color: #92400E;">Premium</div>
+            <div style="font-size: 13px; color: #78350F; margin-bottom: 8px;">$[PRECIO] MXN/mes</div>
+            <div style="font-size: 13px; line-height: 1.6;">Transcripción ilimitada<br>Guardar y buscar<br>Historial completo<br>Perfiles ilimitados<br>Vibraciones y sonidos propios</div>
+          </div>
+        </div>
+        <button type="button" onClick="{{togglePremium}}" style="margin-top: 10px; width: 100%; min-height: 52px; border-radius: 14px; border: none; background: {{premBtnBg}}; color: #FFFFFF; font-size: 16px; font-weight: 700;">{{premBtn}}</button>
+        <div style="margin-top: 10px; padding: 12px 14px; border-radius: 14px; background: #EEF2FF; color: #1E3A8A; font-size: 14px; line-height: 1.45;">¿Tu empresa o universidad tiene licencia? Ingresa su código y obtén Premium sin costo.</div>
+      </div>
+
+      <button type="button" onClick="{{restart}}" style="min-height: 44px; border-radius: 12px; border: none; background: transparent; color: #1D4ED8; font-size: 15px; font-weight: 700; text-decoration: underline;">Repetir configuración inicial</button>
+    </div>
+    </sc-if>
+  </div>
+
+  <nav style="display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); background: #FFFFFF; border-top: 1px solid #D0D5DD; padding: 6px 4px 14px;">
+    <sc-for list="{{tabs}}" as="t" hint-placeholder-count="5">
+      <button type="button" onClick="{{t.pick}}" aria-current="{{t.current}}" style="min-height: 56px; border: none; background: transparent; color: {{t.fg}}; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; font-size: 12px; font-weight: 700; padding: 0 2px;">
+        <span style="width: 44px; height: 28px; border-radius: 14px; background: {{t.pill}}; display: flex; align-items: center; justify-content: center;">
+          <sc-if value="{{t.iBook}}" hint-placeholder-val="{{false}}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5a2 2 0 0 1 2-2h5a2 2 0 0 1 2 2v15a2 2 0 0 0-2-2H3z"></path><path d="M21 5a2 2 0 0 0-2-2h-5a2 2 0 0 0-2 2v15a2 2 0 0 1 2-2h7z"></path></svg></sc-if>
+          <sc-if value="{{t.iHome}}" hint-placeholder-val="{{false}}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"></path></svg></sc-if>
+          <sc-if value="{{t.iText}}" hint-placeholder-val="{{false}}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"></rect><path d="M7 10h4M7 14h8M14 10h3"></path></svg></sc-if>
+          <sc-if value="{{t.iChat}}" hint-placeholder-val="{{false}}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"></path></svg></sc-if>
+          <sc-if value="{{t.iGear}}" hint-placeholder-val="{{false}}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"></path></svg></sc-if>
+        </span>
+        <span>{{t.label}}</span>
+      </button>
+    </sc-for>
+  </nav>
+</div>
+</sc-if>
+
+<!-- ============ ALERTA (pantalla completa) ============ -->
+<sc-if value="{{hasAlert}}" hint-placeholder-val="{{false}}">
+<div style="position: absolute; inset: 0; background: {{alert.color}}; color: #FFFFFF; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px; padding: 32px 28px; text-align: center; z-index: 5;">
+  <div style="font-size: 14px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; padding: 6px 14px; border-radius: 14px; background: rgba(0,0,0,.22);">Prioridad {{alert.prio}}</div>
+  <div class="shake" style="width: 132px; height: 132px; border-radius: 50%; background: rgba(255,255,255,.16); border: 3px solid #FFFFFF; display: flex; align-items: center; justify-content: center;">
+    <sc-if value="{{alert.iSiren}}" hint-placeholder-val="{{false}}"><svg width="72" height="72" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 18v-5a5 5 0 0 1 10 0v5"></path><rect x="4" y="18" width="16" height="3" rx="1"></rect><path d="M12 2v2M4.2 5.2l1.4 1.4M19.8 5.2l-1.4 1.4M2 11h2M20 11h2"></path></svg></sc-if>
+    <sc-if value="{{alert.iName}}" hint-placeholder-val="{{false}}"><svg width="72" height="72" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="4"></circle><path d="M2 21c0-4 3-6 7-6s7 2 7 6"></path><path d="M17 6c1.2 1 1.2 3 0 4M19.5 4c2.4 2.2 2.4 5.8 0 8"></path></svg></sc-if>
+    <sc-if value="{{alert.iDoor}}" hint-placeholder-val="{{false}}"><svg width="72" height="72" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 21V4a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v17"></path><path d="M3 21h18"></path><circle cx="15" cy="12" r="1"></circle></svg></sc-if>
+    <sc-if value="{{alert.iCar}}" hint-placeholder-val="{{false}}"><svg width="72" height="72" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 16V11l2-5h10l2 5v5"></path><path d="M3 16h18v3H3z"></path><circle cx="7.5" cy="13.5" r="1"></circle><circle cx="16.5" cy="13.5" r="1"></circle></svg></sc-if>
+    <sc-if value="{{alert.iFire}}" hint-placeholder-val="{{false}}"><svg width="72" height="72" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22c4 0 7-3 7-7 0-5-5-7-5-12-3 2-5 5-5 8-1-1-2-2-2-4-2 2-2 5-2 8 0 4 3 7 7 7z"></path></svg></sc-if>
+    <sc-if value="{{alert.iShout}}" hint-placeholder-val="{{false}}"><svg width="72" height="72" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10v4h4l6 5V5L7 10z"></path><path d="M16 9l5-3M16 15l5 3M17 12h4"></path></svg></sc-if>
+  </div>
+  <div style="font-size: 32px; font-weight: 700; line-height: 1.15;">{{alert.title}}</div>
+  <div style="font-size: 19px; line-height: 1.35;">{{alert.sub}}</div>
+  <div style="display: flex; align-items: center; gap: 14px; padding: 12px 18px; border-radius: 16px; background: rgba(0,0,0,.22);">
+    <div style="width: 48px; height: 48px; border-radius: 50%; border: 2px solid #FFFFFF; position: relative;">
+      <div style="position: absolute; inset: 0; display: flex; align-items: flex-start; justify-content: center; transform: rotate({{alert.deg}}deg);">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="#FFFFFF" stroke="none" style="margin-top: 2px;"><path d="M12 3l7 12H5z"></path></svg>
+      </div>
+    </div>
+    <div style="text-align: left;">
+      <div style="font-size: 13px; opacity: .9;">Dirección aproximada</div>
+      <div style="font-size: 17px; font-weight: 700;">{{alert.dir}}</div>
+    </div>
+  </div>
+  <div class="flash" style="font-size: 15px;">Vibrando: {{alert.vib}}</div>
+  <sc-if value="{{lightOn}}" hint-placeholder-val="{{false}}">
+    <div style="font-size: 15px; padding: 6px 12px; border-radius: 12px; background: rgba(255,255,255,.2);">Foco de la sala parpadeando</div>
+  </sc-if>
+  <button type="button" onClick="{{dismiss}}" style="margin-top: 8px; width: 100%; min-height: 60px; border-radius: 16px; border: none; background: #FFFFFF; color: {{alert.color}}; font-size: 19px; font-weight: 700;">Entendido</button>
+</div>
+</sc-if>
+
+<!-- ============ TEXTO EN GRANDE ============ -->
+<sc-if value="{{big}}" hint-placeholder-val="{{false}}">
+<div style="position: absolute; inset: 0; background: #0F1B2D; color: #FFFFFF; display: flex; flex-direction: column; padding: 28px 24px; gap: 16px; z-index: 6;">
+  <div style="font-size: 14px; color: #CBD5E1;">Muestra la pantalla a la otra persona</div>
+  <div style="flex: 1; display: flex; align-items: center; font-size: 40px; font-weight: 700; line-height: 1.2;">{{bigText}}</div>
+  <button type="button" onClick="{{hideBig}}" style="min-height: 56px; border-radius: 16px; border: 2px solid #FFFFFF; background: transparent; color: #FFFFFF; font-size: 18px; font-weight: 700;">Cerrar</button>
+</div>
+</sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+var ALERTS = {
+  sirena: { key: 'sirena', label: 'Sirena', title: 'Sirena de emergencia', sub: 'Ambulancia o patrulla cerca de ti', dir: 'Viene de la izquierda', deg: 270, color: '#B42318', prio: 'crítica', vib: 'larga, 3 pulsos', icon: 'iSiren', pattern: [600, 200, 600, 200, 600] },
+  nombre: { key: 'nombre', label: 'Tu nombre', title: 'Te están llamando', sub: 'Alguien dijo «Daniela»', dir: 'Viene de atrás', deg: 180, color: '#1D4ED8', prio: 'alta', vib: '2 pulsos cortos', icon: 'iName', pattern: [150, 100, 150] },
+  timbre: { key: 'timbre', label: 'Timbre', title: 'Alguien está en la puerta', sub: 'Se detectó el timbre', dir: 'Viene de enfrente', deg: 0, color: '#0F766E', prio: 'media', vib: '1 pulso', icon: 'iDoor', pattern: [400] },
+  claxon: { key: 'claxon', label: 'Claxon', title: 'Claxon cerca', sub: 'Vehículo detectado, ten cuidado', dir: 'Viene de la derecha', deg: 90, color: '#B45309', prio: 'alta', vib: 'pulsos rápidos', icon: 'iCar', pattern: [100, 60, 100, 60, 100, 60, 100] },
+  alarma: { key: 'alarma', label: 'Alarma', title: 'Alarma de incendio', sub: 'Posible evacuación: sigue la ruta de salida', dir: 'Todo el edificio', deg: 0, color: '#B42318', prio: 'crítica', vib: 'continua', icon: 'iFire', pattern: [1000, 150, 1000] },
+  grito: { key: 'grito', label: 'Grito', title: 'Grito detectado', sub: 'Alguien gritó cerca de ti', dir: 'Viene de la derecha', deg: 60, color: '#9A3412', prio: 'alta', vib: '3 pulsos', icon: 'iShout', pattern: [250, 120, 250, 120, 250] }
+};
+var ORDER = ['sirena', 'nombre', 'timbre', 'claxon', 'alarma', 'grito'];
+var LINES = [
+  { who: 'Maestra', text: 'Buenos días. Hoy vamos a revisar el estado de resultados.' },
+  { who: 'Maestra', text: 'Primero restamos los costos de venta a los ingresos.' },
+  { who: 'Compañero', text: '¿Eso incluye la renta del local?' },
+  { who: 'Maestra', text: 'No, la renta es un gasto de operación.' },
+  { who: 'Maestra', text: 'Daniela, ¿puedes leer el siguiente punto?', name: true },
+  { who: 'Maestra', text: 'Para el viernes entreguen el ejercicio 3.' }
+];
+var PHRASES = [
+  { tag: 'Yo', text: 'Soy sordo/a. ¿Me lo puede escribir?', tint: '#EEF2FF', ink: '#1E3A8A' },
+  { tag: '↻', text: '¿Me lo repite más despacio, por favor?', tint: '#EEF2FF', ink: '#1E3A8A' },
+  { tag: '$', text: '¿Cuánto cuesta?', tint: '#ECFDF3', ink: '#065F46' },
+  { tag: '→', text: '¿Dónde está la salida?', tint: '#ECFDF3', ink: '#065F46' },
+  { tag: '+', text: 'Necesito un médico.', tint: '#FEE4E2', ink: '#912018' }
+];
+var VOCAB = {
+  locura: { base: 'locura', syl: 'lo · cu · ra', mean: 'Algo que no tiene sentido o no es buena idea.', pic: 'Pictograma: persona confundida', icon: 'iOther' },
+  odiar: { base: 'odiar', syl: 'o · diar', mean: 'Sentir mucho enojo contra algo o alguien. Es lo contrario de amar.', pic: 'Pictograma: corazón roto', icon: 'iOther' },
+  rosas: { base: 'rosa', syl: 'ro · sa', mean: 'Una flor que tiene espinas. Una rosa, muchas rosas.', pic: 'Rosa con espinas', icon: 'iFlower' },
+  pinchó: { base: 'pinchar', syl: 'pin · char', mean: 'Lastimar con algo que tiene punta, como una espina.', note: '«Pinchó» = ya pasó. La rosa te lastimó antes.', pic: 'Pictograma: espina y dedo', icon: 'iOther' },
+  renunciar: { base: 'renunciar', syl: 're · nun · ciar', mean: 'Dejar algo para siempre. Ya no intentarlo.', pic: 'Pictograma: persona que se va', icon: 'iOther' },
+  sueños: { base: 'sueño', syl: 'sue · ño', mean: 'Aquí significa algo que deseas lograr en tu vida.', note: 'Ojo: «sueño» también es lo que ves al dormir, o tener ganas de dormir. Tiene tres significados y cada uno tiene una seña distinta.', pic: 'Nube con estrella: una meta', icon: 'iCloud' },
+  cumplió: { base: 'cumplir', syl: 'cum · plir', mean: 'Hacerse realidad. «No se cumplió» = no pasó lo que querías.', note: '«Cumplió» = ya pasó.', pic: 'Pictograma: palomita de logrado', icon: 'iOther' }
+};
+var PHRASE = 'Es una locura odiar a todas las rosas solo porque una te pinchó. Renunciar a todos tus sueños solo porque uno de ellos no se cumplió.';
+var QUIZ = [
+  { text: 'Las rosas son peligrosas y hay que alejarse de ellas.', ok: false },
+  { text: 'Si algo sale mal una vez, no te rindas con todo.', ok: true },
+  { text: 'Es mejor dejar de soñar para no sufrir.', ok: false }
+];
+var SPELL = [
+  { id: 'cuadrado', word: 'CUADRADO', shape: 'sq', title: 'Figura 1' },
+  { id: 'circulo', word: 'CIRCULO', shape: 'ci', title: 'Figura 2' },
+  { id: 'triangulo', word: 'TRIANGULO', shape: 'tr', title: 'Figura 3' },
+  { id: 'rombo', word: 'ROMBO', shape: 'ro', title: 'Figura 4' }
+];
+var PROFILES = ['Casa', 'Universidad', 'Trabajo', 'Calle'];
+var FREE_PROFILES = ['Casa', 'Universidad'];
+
+function vibrate(p) { try { if (navigator.vibrate) navigator.vibrate(p); } catch (e) {} }
+function chip(on) { return on ? { bd: '#1D4ED8', bg: '#1D4ED8', fg: '#FFFFFF' } : { bd: '#98A2B3', bg: '#FFFFFF', fg: '#0F1B2D' }; }
+
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = {
+      screen: 'onboarding', tab: 'inicio', listening: true, alert: null, history: [],
+      enabled: { sirena: true, nombre: true, timbre: true, claxon: true, alarma: true, grito: true },
+      ob: { com: 'Español escrito y LSM', grado: 'Severa', uso: 'Universidad' },
+      profile: 'Universidad', premium: false, upsell: false,
+      mode: 'clase', transcribing: false, shown: 0, fontSize: 19,
+      text: '', big: false, bigText: '',
+      devices: { mic: false, foco: false, aux: false, watch: false },
+      readView: 'texto', word: 'sueños', quizPick: null,
+      spellMode: 'aprender', spell: {}, spellChecked: false
+    };
+    this.timer = null;
+  }
+  componentWillUnmount() { if (this.timer) clearInterval(this.timer); }
+
+  fire(key) {
+    var s = this.state;
+    if (!s.enabled[key] || !s.listening) return;
+    var a = ALERTS[key];
+    vibrate(a.pattern);
+    var now = new Date();
+    var t = now.getHours() + ':' + String(now.getMinutes()).padStart(2, '0');
+    var h = [{ title: a.title, dir: a.dir, color: a.color, time: t }].concat(s.history).slice(0, 20);
+    this.setState({ alert: key, history: h });
+  }
+  tick() {
+    var n = this.state.shown + 1;
+    var line = LINES[n - 1];
+    if (line && line.name) vibrate(ALERTS.nombre.pattern);
+    if (n >= LINES.length) {
+      clearInterval(this.timer); this.timer = null;
+      this.setState({ shown: LINES.length, transcribing: false });
+    } else {
+      this.setState({ shown: n });
+    }
+  }
+  toggleTranscribe() {
+    if (this.state.transcribing) {
+      clearInterval(this.timer); this.timer = null;
+      this.setState({ transcribing: false });
+      return;
+    }
+    var start = this.state.shown >= LINES.length ? 0 : this.state.shown;
+    var self = this;
+    this.setState({ transcribing: true, shown: start }, function () {
+      self.tick();
+      self.timer = setInterval(function () { self.tick(); }, 1700);
+    });
+  }
+
+  renderVals() {
+    var s = this.state;
+    var self = this;
+    var isApp = s.screen === 'app';
+    var a = s.alert ? ALERTS[s.alert] : null;
+    var alertView = a ? Object.assign({}, a, { iSiren: a.icon === 'iSiren', iName: a.icon === 'iName', iDoor: a.icon === 'iDoor', iCar: a.icon === 'iCar', iFire: a.icon === 'iFire', iShout: a.icon === 'iShout' }) : { color: '#000', prio: '', title: '', sub: '', dir: '', deg: 0, vib: '' };
+
+    function obList(field, opts) {
+      return opts.map(function (o) {
+        var on = s.ob[field] === o;
+        var c = chip(on);
+        return { label: o, on: on, bd: c.bd, bg: c.bg, fg: c.fg, pick: function () { var ob = Object.assign({}, s.ob); ob[field] = o; self.setState({ ob: ob }); } };
+      });
+    }
+
+    var titles = { inicio: 'Inicio', transcribir: 'Transcribir', comunicar: 'Comunicar', leer: 'Aprender a leer', ajustes: 'Ajustes' };
+    var tabs = [
+      { id: 'inicio', label: 'Inicio', icon: 'iHome' },
+      { id: 'transcribir', label: 'Transcribir', icon: 'iText' },
+      { id: 'comunicar', label: 'Comunicar', icon: 'iChat' },
+      { id: 'leer', label: 'Leer', icon: 'iBook' },
+      { id: 'ajustes', label: 'Ajustes', icon: 'iGear' }
+    ].map(function (t) {
+      var on = s.tab === t.id;
+      return { label: t.label, current: on ? 'page' : 'false', fg: on ? '#1D4ED8' : '#475467', pill: on ? '#DBEAFE' : 'transparent',
+        iHome: t.icon === 'iHome', iText: t.icon === 'iText', iChat: t.icon === 'iChat', iGear: t.icon === 'iGear', iBook: t.icon === 'iBook',
+        pick: function () { self.setState({ tab: t.id, upsell: false }); } };
+    });
+
+    var demoButtons = ORDER.map(function (k) {
+      var al = ALERTS[k]; var on = s.enabled[k] && s.listening;
+      return { label: al.label, dot: on ? al.color : '#98A2B3', bd: on ? al.color : '#D0D5DD', fg: on ? '#0F1B2D' : '#667085', state: s.enabled[k] ? (s.listening ? 'Probar' : 'En pausa') : 'Desactivada', fire: function () { self.fire(k); } };
+    });
+
+    var histLimit = s.premium ? 20 : 3;
+    var history = s.history.slice(0, histLimit);
+
+    var lines = LINES.slice(0, s.shown).map(function (l) {
+      return { who: l.who, text: l.text, bg: l.name ? '#FDE68A' : 'transparent', fg: l.name ? '#0F1B2D' : '#FFFFFF', whoColor: l.name ? '#78350F' : (l.who === 'Maestra' ? '#93C5FD' : '#86EFAC'), pad: l.name ? '10px 12px' : '0' };
+    });
+
+    var modes = [{ id: 'conversacion', label: 'Conversación' }, { id: 'clase', label: 'Clase o reunión' }].map(function (m) {
+      var on = s.mode === m.id;
+      return { label: m.label, on: on, bg: on ? '#FFFFFF' : 'transparent', fg: on ? '#1D4ED8' : '#344054', pick: function () { self.setState({ mode: m.id }); } };
+    });
+    var micExt = s.devices.mic;
+    var micLabel = micExt ? 'Micrófono externo conectado' : 'Micrófono del celular';
+    var micHint = s.mode === 'clase'
+      ? (micExt ? 'Solapa en el maestro: la voz lejana se entiende mejor' : 'Para clases conecta un micrófono inalámbrico (Ajustes)')
+      : 'Pon el celular entre tú y la otra persona';
+
+    var profiles = PROFILES.map(function (p) {
+      var locked = !s.premium && FREE_PROFILES.indexOf(p) < 0;
+      var on = s.profile === p; var c = chip(on);
+      return { label: p, on: on, locked: locked, bd: c.bd, bg: c.bg, fg: c.fg, pick: function () { if (locked) self.setState({ upsell: true }); else self.setState({ profile: p, upsell: false }); } };
+    });
+
+    var alertToggles = ORDER.map(function (k) {
+      var al = ALERTS[k]; var on = s.enabled[k];
+      return { label: al.label, color: al.color, prio: al.prio, vib: al.vib, on: on, track: on ? '#1D4ED8' : '#98A2B3', knob: on ? '28px' : '4px',
+        toggle: function () { var e = Object.assign({}, s.enabled); e[k] = !e[k]; self.setState({ enabled: e }); } };
+    });
+
+    var devDefs = [
+      { id: 'mic', label: 'Micrófono externo', sub: 'USB-C o inalámbrico de solapa' },
+      { id: 'foco', label: 'Foco inteligente', sub: 'Parpadea con cada alerta en casa' },
+      { id: 'aux', label: 'Auxiliar auditivo o implante', sub: 'Bluetooth (ASHA / LE Audio)' },
+      { id: 'watch', label: 'Smartwatch', sub: 'Próximamente · Premium' }
+    ];
+    var devices = devDefs.map(function (d) {
+      var on = s.devices[d.id]; var soon = d.id === 'watch';
+      return { label: d.label, sub: d.sub, btn: soon ? 'Pronto' : (on ? 'Conectado' : 'Conectar'),
+        bd: soon ? '#D0D5DD' : (on ? '#0F766E' : '#1D4ED8'), bg: on ? '#0F766E' : '#FFFFFF', fg: soon ? '#667085' : (on ? '#FFFFFF' : '#1D4ED8'),
+        toggle: function () { if (soon) return; var dv = Object.assign({}, s.devices); dv[d.id] = !dv[d.id]; self.setState({ devices: dv }); } };
+    });
+
+    var phrases = PHRASES.map(function (p) {
+      return { tag: p.tag, text: p.text, tint: p.tint, ink: p.ink, pick: function () { self.setState({ text: p.text, big: true, bigText: p.text }); } };
+    });
+
+    var tokens = PHRASE.split(' ').map(function (raw) {
+      var clean = raw.replace(/[.,]/g, '').toLowerCase();
+      var key = VOCAB[clean] ? clean : null;
+      var on = key && s.word === key;
+      return { text: raw, isKey: !!key, plain: !key, on: !!on, bg: on ? '#1D4ED8' : '#DBEAFE', fg: on ? '#FFFFFF' : '#1E3A8A',
+        pick: function () { if (key) self.setState({ word: key }); } };
+    });
+    var wv = s.word ? VOCAB[s.word] : null;
+    var wordView = wv ? Object.assign({}, wv, {
+      hasNote: !!wv.note, note: wv.note || '',
+      iFlower: wv.icon === 'iFlower', iCloud: wv.icon === 'iCloud', iOther: wv.icon === 'iOther',
+      letters: wv.base.toUpperCase().split('').map(function (c) { return { c: c }; })
+    }) : { base: '', syl: '', mean: '', pic: '', letters: [], hasNote: false, note: '' };
+    var learn = s.spellMode === 'aprender';
+    var okWords = 0;
+    var spellRows = SPELL.map(function (w) {
+      var ans = s.spell[w.id] || [];
+      var letters = w.word.split('');
+      var wordOk = letters.every(function (c, i) { return (ans[i] || '') === c; });
+      if (wordOk) okWords++;
+      var show = s.spellChecked && !learn;
+      return {
+        title: w.title, count: letters.length, sq: w.shape === 'sq', ci: w.shape === 'ci', tr: w.shape === 'tr', ro: w.shape === 'ro',
+        showResult: show, resLabel: wordOk ? w.word : 'Revisa', resBg: wordOk ? '#ECFDF3' : '#FEF3F2', resFg: wordOk ? '#065F46' : '#912018',
+        cardBd: show ? (wordOk ? '#0F766E' : '#F04438') : '#D0D5DD',
+        cells: letters.map(function (c, i) {
+          var v = learn ? c : (ans[i] || '');
+          var good = v === c;
+          return {
+            num: i + 1, val: v, ro: learn, aria: 'Letra ' + (i + 1) + ' de ' + letters.length,
+            bd: learn ? '#1D4ED8' : (show ? (good ? '#0F766E' : '#F04438') : '#98A2B3'),
+            bg: learn ? '#EEF2FF' : (show ? (good ? '#ECFDF3' : '#FEF3F2') : '#FFFFFF'),
+            onChange: function (e) {
+              if (learn) return;
+              var ch = (e.target.value || '').slice(-1).toUpperCase();
+              var sp = Object.assign({}, self.state.spell);
+              var arr = (sp[w.id] || []).slice(); arr[i] = ch; sp[w.id] = arr;
+              self.setState({ spell: sp, spellChecked: false });
+            }
+          };
+        })
+      };
+    });
+    var spellModes = [{ id: 'aprender', label: 'Aprender (con letras)' }, { id: 'practicar', label: 'Practicar' }].map(function (m) {
+      var on = s.spellMode === m.id;
+      return { label: m.label, on: on, bg: on ? '#FFFFFF' : 'transparent', fg: on ? '#1D4ED8' : '#344054', pick: function () { self.setState({ spellMode: m.id, spellChecked: false }); } };
+    });
+    var readViews = [{ id: 'texto', label: 'Texto' }, { id: 'lsm', label: 'LSM' }, { id: 'facil', label: 'Fácil' }, { id: 'deletrear', label: 'Deletrear' }].map(function (v) {
+      var on = s.readView === v.id;
+      return { label: v.label, on: on, bg: on ? '#FFFFFF' : 'transparent', fg: on ? '#1D4ED8' : '#344054', pick: function () { self.setState({ readView: v.id }); } };
+    });
+    var quiz = QUIZ.map(function (q, i) {
+      var picked = s.quizPick === i;
+      var showOk = s.quizPick !== null && q.ok;
+      return { text: q.text, bd: showOk ? '#0F766E' : (picked ? '#B42318' : '#D0D5DD'), bg: showOk ? '#ECFDF3' : (picked ? '#FEF3F2' : '#FFFFFF'),
+        pick: function () { self.setState({ quizPick: i }); } };
+    });
+    var quizOk = s.quizPick !== null && QUIZ[s.quizPick].ok;
+
+    return {
+      isLeer: s.tab === 'leer',
+      readViews: readViews, rvTexto: s.readView === 'texto', rvLsm: s.readView === 'lsm', rvFacil: s.readView === 'facil',
+      rvDeletrear: s.readView === 'deletrear', notDeletrear: s.readView !== 'deletrear',
+      spellModes: spellModes, spellRows: spellRows, spellPractice: !learn,
+      spellChecked: s.spellChecked && !learn,
+      spellScore: okWords === SPELL.length ? '¡Excelente! 4 de 4 palabras correctas.' : okWords + ' de 4 palabras correctas. Corrige las casillas en rojo.',
+      spellScoreColor: okWords === SPELL.length ? '#0F766E' : '#B42318',
+      checkSpell: function () { self.setState({ spellChecked: true }); },
+      resetSpell: function () { self.setState({ spell: {}, spellChecked: false }); },
+      tokens: tokens, hasWord: !!wv, word: wordView,
+      quiz: quiz, quizDone: s.quizPick !== null,
+      quizMsg: quizOk ? '¡Correcto! Un error no significa que todo saldrá mal.' : 'Casi. Mira la versión en LSM o en español fácil y vuelve a intentarlo.',
+      quizColor: quizOk ? '#0F766E' : '#B42318',
+
+      isOnboarding: s.screen === 'onboarding', isApp: isApp,
+      obCom: obList('com', ['LSM', 'Español escrito y LSM', 'Español oral y lectura de labios']),
+      obGrado: obList('grado', ['Leve', 'Moderada', 'Severa', 'Profunda']),
+      obUso: obList('uso', PROFILES),
+      finishOnboarding: function () {
+        var p = FREE_PROFILES.indexOf(s.ob.uso) >= 0 || s.premium ? s.ob.uso : 'Universidad';
+        self.setState({ screen: 'app', tab: 'inicio', profile: p });
+      },
+      restart: function () { self.setState({ screen: 'onboarding' }); },
+
+      screenTitle: titles[s.tab], profile: s.profile, premium: s.premium, notPremium: !s.premium,
+      tabs: tabs,
+      isInicio: s.tab === 'inicio', isTranscribir: s.tab === 'transcribir', isComunicar: s.tab === 'comunicar', isAjustes: s.tab === 'ajustes',
+
+      listening: s.listening,
+      statusBg: s.listening ? '#1D4ED8' : '#475467',
+      statusTitle: s.listening ? 'Escuchando tu entorno' : 'En pausa',
+      statusSub: s.listening ? 'Perfil ' + s.profile + ' · ' + ORDER.filter(function (k) { return s.enabled[k]; }).length + ' alertas activas' : 'No recibirás alertas',
+      listenBtn: s.listening ? 'Pausar' : 'Activar',
+      listenAria: s.listening ? 'Pausar la escucha' : 'Activar la escucha',
+      toggleListening: function () { self.setState({ listening: !s.listening }); },
+      demoButtons: demoButtons,
+      history: history, noHistory: s.history.length === 0, historyLocked: !s.premium && s.history.length > 3,
+
+      hasAlert: !!a, alert: alertView, lightOn: s.devices.foco,
+      dismiss: function () { self.setState({ alert: null }); },
+
+      modes: modes, micLabel: micLabel, micHint: micHint,
+      transcribing: s.transcribing,
+      trBtn: s.transcribing ? 'Pausar' : (s.shown >= LINES.length ? 'Volver a empezar' : 'Empezar a transcribir'),
+      trBtnBg: s.transcribing ? '#B42318' : '#1D4ED8',
+      toggleTranscribe: function () { self.toggleTranscribe(); },
+      fontPx: s.fontSize + 'px',
+      fontUp: function () { self.setState({ fontSize: Math.min(30, s.fontSize + 2) }); },
+      fontDown: function () { self.setState({ fontSize: Math.max(15, s.fontSize - 2) }); },
+      lines: lines, noLines: s.shown === 0,
+      saveLabel: s.premium ? 'Guardar transcripción' : 'Guardar transcripción · Premium',
+      saveTranscript: function () { if (!s.premium) self.setState({ tab: 'ajustes', upsell: true }); },
+
+      text: s.text,
+      onText: function (e) { self.setState({ text: e.target.value }); },
+      showBig: function () { if (s.text.trim()) self.setState({ big: true, bigText: s.text }); },
+      clearText: function () { self.setState({ text: '' }); },
+      phrases: phrases,
+      sos: function () { self.setState({ big: true, bigText: 'Soy una persona sorda. Necesito ayuda. Ya envié mi ubicación a mis contactos.' }); },
+      big: s.big, bigText: s.bigText,
+      hideBig: function () { self.setState({ big: false }); },
+
+      upsell: s.upsell, profiles: profiles, alertToggles: alertToggles, devices: devices,
+      freeBd: s.premium ? '#D0D5DD' : '#1D4ED8', premBd: s.premium ? '#B45309' : '#FCD34D',
+      premBtn: s.premium ? 'Volver a Gratis (demo)' : 'Probar Premium (demo)',
+      premBtnBg: s.premium ? '#475467' : '#B45309',
+      togglePremium: function () { self.setState({ premium: !s.premium, upsell: false }); }
+    };
+  }
+}
+</script>
+</body>
+</html>
