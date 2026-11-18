@@ -242,7 +242,30 @@
       align-items: center;
       justify-content: center;
       margin-bottom: 14px;
+      padding: 0;
+      border: 0;
+      border-radius: 50%;
+      background: none;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
     }
+
+    .radar-rings:focus-visible {
+      outline: 3px solid var(--blue-jeans);
+      outline-offset: 4px;
+    }
+
+    .mic-off {
+      display: none;
+      position: relative;
+      z-index: 2;
+      width: 46px;
+      height: 46px;
+      color: var(--dark-blue);
+    }
+
+    .radar-rings.paused .wave-bars { display: none; }
+    .radar-rings.paused .mic-off { display: block; }
 
     .radar-circle {
       position: absolute;
@@ -1163,18 +1186,24 @@
         </button>
 
         <div class="radar-card">
-          <div class="radar-rings" id="radarRings">
-            <div class="radar-circle c1"></div>
-            <div class="radar-circle c2"></div>
-            <div class="radar-circle c3"></div>
-            <div class="wave-bars" id="waveBars">
-              <div class="wave-bar" style="height: 16px;"></div>
-              <div class="wave-bar" style="height: 30px;"></div>
-              <div class="wave-bar" style="height: 40px;"></div>
-              <div class="wave-bar" style="height: 26px;"></div>
-              <div class="wave-bar" style="height: 18px;"></div>
-            </div>
-          </div>
+          <button type="button" class="radar-rings" id="radarRings" onclick="toggleListening()" aria-pressed="false" aria-label="Escuchando. Toca para pausar el monitoreo">
+            <span class="radar-circle c1"></span>
+            <span class="radar-circle c2"></span>
+            <span class="radar-circle c3"></span>
+            <span class="wave-bars" id="waveBars">
+              <span class="wave-bar" style="height: 16px;"></span>
+              <span class="wave-bar" style="height: 30px;"></span>
+              <span class="wave-bar" style="height: 40px;"></span>
+              <span class="wave-bar" style="height: 26px;"></span>
+              <span class="wave-bar" style="height: 18px;"></span>
+            </span>
+            <svg class="mic-off" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="5.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <rect x="17" y="6" width="14" height="24" rx="7"/>
+              <path d="M10 22c0 8 6 14 14 14s14-6 14-14"/>
+              <path d="M24 36v6M17 42h14"/>
+              <path d="M8 8l32 32"/>
+            </svg>
+          </button>
           <div class="radar-title" id="listenTitle">Escuchando tu entorno</div>
           <div class="radar-sub" id="listenSub">Detectando sonidos importantes y la mención de tu nombre («Daniela»).</div>
           <button type="button" class="status-pill-btn" onclick="toggleListening()">
@@ -1543,6 +1572,10 @@
       const dot = document.getElementById('listenDot');
       rings.classList.toggle('paused', !state.isListening);
       dot.classList.toggle('paused', !state.isListening);
+      rings.setAttribute('aria-pressed', String(!state.isListening));
+      rings.setAttribute('aria-label', state.isListening
+        ? 'Escuchando. Toca para pausar el monitoreo'
+        : 'Monitoreo en pausa. Toca para reanudar');
       document.getElementById('listenTitle').textContent = state.isListening ? 'Escuchando tu entorno' : 'Monitoreo en pausa';
       document.getElementById('listenSub').textContent = state.isListening
         ? 'Detectando sonidos importantes y la mención de tu nombre («Daniela»).'
