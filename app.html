@@ -2,36 +2,38 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Ziva · Asistente de Accesibilidad Auditiva</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Figtree:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&family=Playfair+Display:ital,wght@0,600;0,700;0,800;1,600;1,700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
-  <link href="https://api.fontshare.com/v2/css?f[]=cabinet-grotesk@800,700,600,500,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #FAF9FD;
+      /* Paleta oficial Ziva */
+      --sky-blue: #A7CADF;
+      --blue-jeans: #325978;
+      --dark-blue: #0D243B;
+      --silver-stars: #B8C3C7;
+      --black-cherry: #730F1A;
+
+      /* Roles */
+      --bg: #F3F7FA;
       --surface: #FFFFFF;
-      --surface-subtle: #F5F3FF;
-      --border: #E8E5F3;
-      --border-focus: #DDD6FE;
-      --text-main: #0F172A;
-      --text-muted: #64748B;
-      --text-subtle: #94A3B8;
-      --primary: #7C3AED;
-      --primary-light: #F5F3FF;
-      --primary-dark: #6D28D9;
-      --primary-glow: rgba(124, 58, 237, 0.25);
-      --danger: #DC2626;
-      --danger-light: #FEF2F2;
-      --warning: #D97706;
-      --warning-light: #FFFBEB;
-      --success: #059669;
-      --success-light: #ECFDF5;
+      --surface-subtle: #E8F0F6;
+      --border: rgba(184, 195, 199, 0.65);
+      --border-strong: rgba(50, 89, 120, 0.3);
+      --text-main: var(--dark-blue);
+      --text-muted: var(--blue-jeans);
+      --text-dim: #526D82;
+      --primary: var(--blue-jeans);
+      --primary-hover: var(--dark-blue);
+      --danger: var(--black-cherry);
+      --alert-tint: #FDF2F4;
+      --alert-border: #F2C6CC;
+      --success: #047857;
+      --success-bg: #ECFDF5;
       --font-title: 'Playfair Display', Georgia, serif;
-      --font-grotesk: 'Cabinet Grotesk', -apple-system, sans-serif;
-      --font: 'Figtree', -apple-system, BlinkMacSystemFont, sans-serif;
-      --font-mono: 'Space Grotesk', monospace;
+      --font: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
     }
 
     * {
@@ -43,7 +45,7 @@
 
     body {
       font-family: var(--font);
-      background-color: #E2E8F0;
+      background-color: #DDE7F0;
       color: var(--text-main);
       display: flex;
       justify-content: center;
@@ -51,10 +53,13 @@
       min-height: 100vh;
       min-height: 100dvh;
       overflow-x: hidden;
-      margin: 0;
     }
 
-    /* Mobile Frame */
+    button, input, textarea {
+      font-family: inherit;
+    }
+
+    /* Contenedor móvil */
     .app-viewport {
       width: 100%;
       max-width: 420px;
@@ -69,130 +74,63 @@
 
     @media (min-width: 480px) {
       body {
-        padding: 20px;
+        padding: 18px;
       }
       .app-viewport {
-        border-radius: 40px;
-        height: 860px;
-        max-height: 92vh;
-        border: 8px solid #0F172A;
-        box-shadow: 0 25px 60px -15px rgba(15, 23, 42, 0.25), 0 0 0 1px rgba(0, 0, 0, 0.05);
+        border-radius: 38px;
+        height: 850px;
+        max-height: 94vh;
+        border: 8px solid var(--dark-blue);
+        box-shadow: 0 24px 60px -15px rgba(13, 36, 59, 0.3);
       }
     }
 
-    /* Top Status Bar (Native look) */
+    /* Status bar */
     .status-bar {
-      height: 44px;
-      padding: 0 24px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--text-main);
-      background: var(--bg);
-      z-index: 10;
-      flex-shrink: 0;
-    }
-
-    .status-bar .notch-pill {
-      width: 90px;
-      height: 20px;
-      background: #0F172A;
-      border-radius: 12px;
-    }
-
-    /* Header */
-    .app-header {
-      padding: 10px 20px 14px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      background: var(--bg);
-      flex-shrink: 0;
-      border-bottom: 1px solid rgba(232, 229, 243, 0.8);
-    }
-
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .brand-icon {
-      width: 36px;
       height: 36px;
-      border-radius: 11px;
-      background: linear-gradient(135deg, #8B5CF6, #6D28D9);
+      padding: 0 22px;
       display: flex;
       align-items: center;
-      justify-content: center;
-      color: #FFF;
-      box-shadow: 0 4px 12px rgba(124, 58, 237, 0.35);
-    }
-
-    .brand-title {
-      font-family: var(--font-grotesk);
-      font-size: 22px;
-      font-weight: 800;
-      letter-spacing: -0.01em;
-      color: var(--text-main);
-    }
-
-    .profile-pill {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      padding: 5px 12px;
-      border-radius: 20px;
+      justify-content: space-between;
       font-size: 12px;
       font-weight: 600;
-      color: var(--text-muted);
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-      font-weight: 600;
-      color: var(--text-muted);
-      cursor: pointer;
-      transition: all 0.2s;
+      color: var(--dark-blue);
+      background: var(--bg);
+      flex-shrink: 0;
     }
 
-    .profile-pill:hover {
-      border-color: var(--primary);
-      color: var(--primary);
+    .notch-pill {
+      width: 82px;
+      height: 18px;
+      background: var(--dark-blue);
+      border-radius: 10px;
     }
 
-    .profile-pill .dot {
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      background: var(--success);
-    }
-
-    /* Main Scrollable View */
+    /* Contenido principal con scroll */
     .app-content {
       flex: 1;
       overflow-y: auto;
       overflow-x: hidden;
-      padding: 16px 18px 24px;
+      padding: 8px 18px 20px;
       display: flex;
       flex-direction: column;
-      gap: 16px;
+      gap: 14px;
       -webkit-overflow-scrolling: touch;
     }
 
     .app-content::-webkit-scrollbar {
-      display: none;
+      width: 4px;
+    }
+    .app-content::-webkit-scrollbar-thumb {
+      background: var(--silver-stars);
+      border-radius: 4px;
     }
 
-    /* Screen Views */
     .tab-view {
       display: none;
       flex-direction: column;
-      gap: 16px;
-      animation: fadeIn 0.2s ease-out;
+      gap: 14px;
+      animation: fadeIn 0.18s ease-out;
     }
 
     .tab-view.active {
@@ -204,1671 +142,1816 @@
       to { opacity: 1; transform: translateY(0); }
     }
 
-    /* Radar View - Live Listening Section */
-    .listening-hero {
-      background: var(--surface);
-      border-radius: 24px;
+    /* Headers internos de pantalla */
+    .screen-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 4px 0 2px;
+      gap: 10px;
+    }
+
+    .screen-title {
+      font-family: var(--font-title);
+      font-size: 26px;
+      font-weight: 700;
+      color: var(--dark-blue);
+      line-height: 1.15;
+    }
+
+    .icon-btn {
+      min-width: 44px;
+      min-height: 44px;
+      border-radius: 14px;
       border: 1px solid var(--border);
-      padding: 24px 20px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-      position: relative;
-      overflow: hidden;
-      box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.03);
-    }
-
-    .radar-visualizer {
-      position: relative;
-      width: 140px;
-      height: 140px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin: 12px 0 16px;
-    }
-
-    .radar-ring {
-      position: absolute;
-      inset: 0;
-      border-radius: 50%;
-      border: 1.5px solid rgba(124, 58, 237, 0.2);
-      animation: ripple 3s cubic-bezier(0.2, 0.8, 0.2, 1) infinite;
-    }
-
-    .radar-ring:nth-child(2) {
-      animation-delay: 1s;
-    }
-
-    .radar-ring:nth-child(3) {
-      animation-delay: 2s;
-    }
-
-    .radar-core {
-      width: 72px;
-      height: 72px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, #8B5CF6, #6D28D9);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #FFF;
-      box-shadow: 0 10px 25px rgba(124, 58, 237, 0.35);
-      z-index: 2;
-      transition: transform 0.2s;
-    }
-
-    .radar-core.paused {
-      background: #64748B;
-      box-shadow: 0 8px 20px rgba(100, 116, 139, 0.25);
-    }
-
-    @keyframes ripple {
-      0% { transform: scale(0.6); opacity: 0.8; }
-      100% { transform: scale(1.6); opacity: 0; }
-    }
-
-    .listening-status {
-      font-family: var(--font-grotesk);
-      font-size: 21px;
-      font-weight: 800;
-      letter-spacing: -0.01em;
-      color: var(--text-main);
-      margin-bottom: 4px;
-    }
-
-    .listening-sub {
-      font-size: 13px;
-      color: var(--text-muted);
-      max-width: 260px;
-      line-height: 1.4;
-      margin-bottom: 14px;
-    }
-
-    .audio-meter {
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      height: 24px;
-      margin-bottom: 12px;
-    }
-
-    .meter-bar {
-      width: 4px;
-      border-radius: 2px;
-      background: var(--primary);
-      transition: height 0.15s ease;
-    }
-
-    .listen-toggle-btn {
+      background: var(--surface);
+      color: var(--dark-blue);
       display: inline-flex;
       align-items: center;
-      gap: 8px;
-      background: var(--surface-subtle);
-      border: 1px solid var(--border);
-      padding: 8px 18px;
-      border-radius: 20px;
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--text-main);
+      justify-content: center;
       cursor: pointer;
-      transition: all 0.2s;
+      transition: background 0.15s, border-color 0.15s;
+      flex-shrink: 0;
     }
 
-    .listen-toggle-btn:hover {
-      background: #E2E8F0;
+    .icon-btn:hover {
+      background: var(--surface-subtle);
+      border-color: var(--border-strong);
     }
 
-    /* Simulation Bar (Clean, unobtrusive test pills) */
-    .section-label {
-      font-size: 12px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      color: var(--text-muted);
-      margin: 4px 0 2px 2px;
+    /* Inicio: header marca + perfil */
+    .brand-row {
       display: flex;
       align-items: center;
       justify-content: space-between;
     }
 
-    .demo-bar-wrapper {
-      background: var(--surface);
-      border-radius: 20px;
-      border: 1px solid var(--border);
-      padding: 14px 16px;
-    }
-
-    .demo-bar-title {
-      font-size: 13px;
-      font-weight: 700;
-      color: var(--text-main);
-      margin-bottom: 4px;
+    .brand-lockup {
       display: flex;
       align-items: center;
-      gap: 6px;
-    }
-
-    .demo-bar-desc {
-      font-size: 12px;
-      color: var(--text-muted);
-      margin-bottom: 12px;
-    }
-
-    .demo-chips-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
       gap: 8px;
     }
 
-    .demo-chip {
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 10px 8px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 6px;
-      font-size: 12px;
+    .brand-name {
+      font-size: 23px;
       font-weight: 600;
-      color: var(--text-main);
-      cursor: pointer;
-      transition: all 0.15s;
-      text-align: center;
+      color: var(--dark-blue);
+      letter-spacing: -0.01em;
     }
 
-    .demo-chip:hover {
-      border-color: var(--primary);
-      background: var(--primary-light);
-      color: var(--primary-dark);
-      transform: translateY(-1px);
-    }
-
-    .demo-chip:active {
-      transform: scale(0.96);
-    }
-
-    .demo-chip .icon-wrap {
-      width: 28px;
-      height: 28px;
-      border-radius: 8px;
+    .profile-selector-btn {
+      width: 100%;
+      min-height: 44px;
+      padding: 8px 14px;
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      background: var(--surface-subtle);
+      color: var(--dark-blue);
+      font-size: 14px;
+      font-weight: 600;
       display: flex;
       align-items: center;
       justify-content: center;
+      gap: 8px;
+      cursor: pointer;
+      transition: border-color 0.15s;
     }
 
-    .chip-critico .icon-wrap { background: var(--danger-light); color: var(--danger); }
-    .chip-alto .icon-wrap { background: var(--warning-light); color: var(--warning); }
-    .chip-info .icon-wrap { background: var(--primary-light); color: var(--primary); }
+    .profile-selector-btn:hover {
+      border-color: var(--primary);
+    }
 
-    /* Recent Events Timeline */
-    .events-card {
+    /* Radar central */
+    .radar-card {
       background: var(--surface);
-      border-radius: 20px;
       border: 1px solid var(--border);
-      padding: 14px 16px;
+      border-radius: 26px;
+      padding: 20px 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      box-shadow: 0 6px 20px rgba(13, 36, 59, 0.04);
+    }
+
+    .radar-rings {
+      position: relative;
+      width: 154px;
+      height: 154px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 14px;
+    }
+
+    .radar-circle {
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(167, 202, 223, 0.28);
+      transition: opacity 0.25s;
+    }
+
+    .radar-circle.c1 { inset: 0; animation: pulseSlow 2.8s ease-in-out infinite; }
+    .radar-circle.c2 { inset: 18px; background: rgba(167, 202, 223, 0.45); animation: pulseSlow 2.8s ease-in-out 0.5s infinite; }
+    .radar-circle.c3 { inset: 36px; background: var(--sky-blue); }
+
+    .radar-rings.paused .radar-circle.c1,
+    .radar-rings.paused .radar-circle.c2 {
+      animation: none;
+      opacity: 0.35;
+    }
+
+    @keyframes pulseSlow {
+      0%, 100% { transform: scale(0.96); opacity: 0.7; }
+      50% { transform: scale(1.04); opacity: 1; }
+    }
+
+    .wave-bars {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      height: 44px;
+    }
+
+    .wave-bar {
+      width: 5px;
+      border-radius: 3px;
+      background: var(--dark-blue);
+      transition: height 0.16s ease;
+    }
+
+    .radar-title {
+      font-size: 19px;
+      font-weight: 600;
+      color: var(--dark-blue);
+      margin-bottom: 4px;
+    }
+
+    .radar-sub {
+      font-size: 13px;
+      color: var(--text-muted);
+      max-width: 270px;
+      line-height: 1.45;
+      margin-bottom: 12px;
+    }
+
+    .status-pill-btn {
+      min-height: 44px;
+      padding: 8px 16px;
+      border-radius: 22px;
+      border: 1px solid var(--border);
+      background: var(--surface-subtle);
+      color: var(--dark-blue);
+      font-size: 13px;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+    }
+
+    .status-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: var(--success);
+    }
+
+    .status-dot.paused {
+      background: var(--text-dim);
+    }
+
+    /* Simulador de 7 alertas */
+    .section-kicker {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .sim-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 14px;
       display: flex;
       flex-direction: column;
       gap: 10px;
     }
 
-    .event-item {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 10px 0;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .event-item:last-child {
-      border-bottom: none;
-      padding-bottom: 2px;
-    }
-
-    .event-badge {
-      width: 36px;
-      height: 36px;
-      border-radius: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-    }
-
-    .event-info {
-      flex: 1;
-      min-width: 0;
-    }
-
-    .event-title {
-      font-size: 14px;
-      font-weight: 700;
-      color: var(--text-main);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .event-meta {
-      font-size: 12px;
-      color: var(--text-muted);
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      margin-top: 2px;
-    }
-
-    .event-time {
-      font-size: 11px;
-      font-weight: 600;
-      color: var(--text-subtle);
-      font-family: var(--font-mono);
-    }
-
-    /* Screen 2: Transcribe */
-    .transcribe-controls {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
+    .sim-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
       gap: 8px;
-      background: var(--surface);
-      padding: 10px 14px;
-      border-radius: 16px;
-      border: 1px solid var(--border);
     }
 
-    .mode-toggle {
-      display: flex;
-      background: var(--bg);
-      padding: 3px;
+    .sim-chip {
+      min-height: 44px;
+      padding: 8px 10px;
       border-radius: 12px;
       border: 1px solid var(--border);
-    }
-
-    .mode-btn {
-      padding: 6px 12px;
-      border-radius: 9px;
+      background: var(--bg);
+      color: var(--dark-blue);
       font-size: 12px;
       font-weight: 600;
-      border: none;
-      background: transparent;
-      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 7px;
       cursor: pointer;
+      text-align: left;
+      transition: border-color 0.15s, background 0.15s;
     }
 
-    .mode-btn.active {
-      background: var(--surface);
-      color: var(--primary);
-      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
-    }
-
-    .font-stepper {
-      display: flex;
-      align-items: center;
-      gap: 4px;
-    }
-
-    .stepper-btn {
-      width: 32px;
-      height: 32px;
-      border-radius: 8px;
-      border: 1px solid var(--border);
-      background: var(--bg);
-      font-size: 13px;
-      font-weight: 700;
-      color: var(--text-main);
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .transcript-window {
-      background: #0F172A;
-      color: #F8FAFC;
-      border-radius: 24px;
-      padding: 18px 16px;
-      min-height: 340px;
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-      position: relative;
-    }
-
-    .transcript-bubble {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-      animation: fadeIn 0.25s ease-out;
-    }
-
-    .speaker-tag {
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
-      color: #94A3B8;
-    }
-
-    .speaker-prof .speaker-tag { color: #60A5FA; }
-    .speaker-mate .speaker-tag { color: #34D399; }
-    .speaker-name-alert {
-      background: rgba(245, 158, 11, 0.15);
-      border-left: 3px solid #F59E0B;
-      padding: 10px 12px;
-      border-radius: 0 12px 12px 0;
-    }
-
-    .speaker-name-alert .speaker-tag {
-      color: #FBBF24;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .dialogue-text {
-      font-size: 16px;
-      line-height: 1.45;
-      color: #F1F5F9;
-      transition: font-size 0.2s;
-    }
-
-    .transcript-status-bar {
-      margin-top: auto;
-      padding-top: 10px;
-      border-top: 1px solid rgba(255, 255, 255, 0.1);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      font-size: 12px;
-      color: #94A3B8;
-    }
-
-    .live-dot {
-      display: inline-block;
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: #EF4444;
-      animation: pulseLive 1.4s infinite;
-    }
-
-    @keyframes pulseLive {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.4; transform: scale(0.85); }
-    }
-
-    .transcribe-action-btn {
-      width: 100%;
-      min-height: 50px;
-      border-radius: 16px;
-      border: none;
-      background: var(--primary);
-      color: #FFF;
-      font-size: 15px;
-      font-weight: 700;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      cursor: pointer;
-      box-shadow: 0 4px 14px rgba(37, 99, 235, 0.25);
-      transition: all 0.2s;
-    }
-
-    .transcribe-action-btn.active {
-      background: var(--danger);
-      box-shadow: 0 4px 14px rgba(220, 38, 38, 0.25);
-    }
-
-    /* Screen 3: Communicate */
-    .quick-write-card {
-      background: var(--surface);
-      border-radius: 20px;
-      border: 1px solid var(--border);
-      padding: 16px;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    .quick-textarea {
-      width: 100%;
-      height: 90px;
-      border: 1.5px solid var(--border);
-      border-radius: 14px;
-      padding: 12px;
-      font-family: inherit;
-      font-size: 16px;
-      color: var(--text-main);
-      resize: none;
-      outline: none;
-      transition: border-color 0.2s;
-    }
-
-    .quick-textarea:focus {
+    .sim-chip:hover {
       border-color: var(--primary);
-    }
-
-    .write-btn-row {
-      display: flex;
-      gap: 8px;
-    }
-
-    .show-big-btn {
-      flex: 1;
-      min-height: 46px;
-      border-radius: 14px;
-      background: var(--text-main);
-      color: #FFF;
-      border: none;
-      font-size: 14px;
-      font-weight: 700;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      cursor: pointer;
-    }
-
-    .clear-btn {
-      min-height: 46px;
-      padding: 0 16px;
-      border-radius: 14px;
       background: var(--surface-subtle);
-      border: 1px solid var(--border);
-      color: var(--text-muted);
-      font-size: 14px;
-      font-weight: 600;
-      cursor: pointer;
     }
 
-    .phrases-list {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
+    .sim-chip.critica {
+      border-color: rgba(115, 15, 26, 0.25);
     }
 
-    .phrase-item {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 14px;
+    .sim-chip.disabled-chip {
+      opacity: 0.45;
+    }
+
+    .sim-chip-wide {
+      grid-column: 1 / -1;
+    }
+
+    /* Feed de últimas alertas */
+    .featured-alert-card {
+      background: var(--alert-tint);
+      border: 1px solid var(--alert-border);
+      border-radius: 18px;
       padding: 12px 14px;
       display: flex;
       align-items: center;
       gap: 12px;
-      font-size: 14px;
-      font-weight: 600;
-      color: var(--text-main);
       cursor: pointer;
-      transition: all 0.15s;
     }
 
-    .phrase-item:hover {
-      border-color: var(--primary);
-      background: var(--primary-light);
-      color: var(--primary-dark);
+    .featured-alert-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      background: var(--black-cherry);
+      color: #FFFFFF;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
     }
 
-    .phrase-badge {
-      width: 28px;
-      height: 28px;
-      border-radius: 8px;
+    .alert-feed-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .feed-row {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 10px 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .feed-badge {
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
       background: var(--surface-subtle);
       display: flex;
       align-items: center;
       justify-content: center;
-      color: var(--text-muted);
-      font-size: 12px;
+      font-size: 16px;
+      flex-shrink: 0;
     }
 
-    .sos-emergency-btn {
-      margin-top: 4px;
+    .feed-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .feed-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--dark-blue);
+    }
+
+    .feed-meta {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .limit-banner {
+      font-size: 12px;
+      color: var(--text-muted);
+      background: var(--surface-subtle);
+      border-radius: 12px;
+      padding: 10px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .link-btn {
+      background: none;
+      border: none;
+      color: var(--black-cherry);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: underline;
+      min-height: 36px;
+      padding: 0 4px;
+    }
+
+    /* Botones generales */
+    .btn-primary {
       width: 100%;
-      min-height: 52px;
+      min-height: 48px;
+      padding: 10px 16px;
       border-radius: 16px;
-      background: var(--danger-light);
-      border: 1.5px solid rgba(220, 38, 38, 0.2);
-      color: var(--danger);
+      border: none;
+      background: var(--blue-jeans);
+      color: #FFFFFF;
       font-size: 14px;
-      font-weight: 700;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    .btn-primary:hover {
+      background: var(--dark-blue);
+    }
+
+    .btn-outline {
+      min-height: 44px;
+      padding: 8px 14px;
+      border-radius: 14px;
+      border: 1px solid var(--border-strong);
+      background: var(--surface);
+      color: var(--dark-blue);
+      font-size: 13px;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      cursor: pointer;
+    }
+
+    .btn-outline:hover {
+      background: var(--surface-subtle);
+    }
+
+    /* Transcripciones */
+    .search-box {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 0 12px;
+      min-height: 44px;
+    }
+
+    .search-box input {
+      border: none;
+      outline: none;
+      width: 100%;
+      font-size: 13px;
+      color: var(--dark-blue);
+      background: transparent;
+    }
+
+    .segmented {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+      padding: 4px;
+      background: var(--surface-subtle);
+      border-radius: 16px;
+    }
+
+    .seg-btn {
+      min-height: 44px;
+      border: none;
+      border-radius: 12px;
+      background: transparent;
+      color: var(--text-muted);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .seg-btn.active {
+      background: var(--blue-jeans);
+      color: #FFFFFF;
+    }
+
+    .folder-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .folder-card {
+      width: 100%;
+      min-height: 58px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 12px 14px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+      text-align: left;
+      transition: border-color 0.15s;
+    }
+
+    .folder-card:hover {
+      border-color: var(--primary);
+    }
+
+    .folder-card.locked {
+      opacity: 0.78;
+    }
+
+    .premium-pill {
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      padding: 3px 8px;
+      border-radius: 8px;
+      background: var(--dark-blue);
+      color: var(--sky-blue);
+      flex-shrink: 0;
+    }
+
+    /* Hablar */
+    .message-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .msg-textarea {
+      width: 100%;
+      min-height: 86px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 12px;
+      font-size: 15px;
+      color: var(--dark-blue);
+      background: var(--bg);
+      resize: none;
+      outline: none;
+    }
+
+    .msg-textarea:focus {
+      border-color: var(--primary);
+      background: var(--surface);
+    }
+
+    .msg-actions {
+      display: grid;
+      grid-template-columns: 1fr auto auto;
+      gap: 8px;
+    }
+
+    .phrases-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+    }
+
+    .phrase-chip {
+      min-height: 54px;
+      padding: 10px;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--dark-blue);
+      font-size: 13px;
+      font-weight: 500;
+      text-align: left;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      line-height: 1.3;
+      transition: border-color 0.15s, background 0.15s;
+    }
+
+    .phrase-chip:hover {
+      border-color: var(--primary);
+      background: var(--surface-subtle);
+    }
+
+    .sos-btn {
+      width: 100%;
+      min-height: 54px;
+      border: none;
+      border-radius: 18px;
+      background: var(--black-cherry);
+      color: #FFFFFF;
+      font-size: 16px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 8px;
       cursor: pointer;
-      transition: all 0.2s;
+      margin-top: auto;
+      box-shadow: 0 8px 20px rgba(115, 15, 26, 0.28);
     }
 
-    .sos-emergency-btn:hover {
-      background: var(--danger);
-      color: #FFF;
+    /* Aprende (Chat Dudas y Definiciones) */
+    .chat-subtitle {
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.45;
     }
 
-    /* Screen 4: Settings & MVP Alerts Customization */
-    .alerts-config-list {
-      background: var(--surface);
-      border-radius: 20px;
-      border: 1px solid var(--border);
-      overflow: hidden;
-    }
-
-    .config-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 12px 16px;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .config-row:last-child {
-      border-bottom: none;
-    }
-
-    .config-info {
+    .chat-thread {
       display: flex;
       flex-direction: column;
-      gap: 2px;
+      gap: 10px;
+      min-height: 220px;
     }
 
-    .config-name {
-      font-size: 14px;
-      font-weight: 700;
-      color: var(--text-main);
+    .bubble {
+      max-width: 86%;
+      padding: 12px 14px;
+      border-radius: 18px;
+      font-size: 13px;
+      line-height: 1.5;
+      color: var(--dark-blue);
     }
 
-    .config-tag {
-      font-size: 12px;
-      color: var(--text-muted);
+    .bubble.user {
+      align-self: flex-end;
+      background: var(--sky-blue);
+      border-bottom-right-radius: 4px;
+    }
+
+    .bubble.ai {
+      align-self: flex-start;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-bottom-left-radius: 4px;
+    }
+
+    .quick-topics {
       display: flex;
-      align-items: center;
+      flex-wrap: wrap;
       gap: 6px;
     }
 
-    .prio-dot {
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
+    .topic-chip {
+      min-height: 36px;
+      padding: 6px 11px;
+      border-radius: 18px;
+      border: 1px solid var(--border-strong);
+      background: var(--surface);
+      color: var(--blue-jeans);
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
     }
 
-    /* iOS style toggle switch */
-    .ios-switch {
-      position: relative;
-      display: inline-block;
+    .chat-input-bar {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 4px 4px 4px 14px;
+    }
+
+    .chat-input-bar input {
+      flex: 1;
+      border: none;
+      outline: none;
+      font-size: 13px;
+      color: var(--dark-blue);
+      background: transparent;
+      min-height: 36px;
+    }
+
+    .chat-send-btn {
       width: 44px;
-      height: 26px;
+      height: 44px;
+      border-radius: 50%;
+      border: none;
+      background: var(--dark-blue);
+      color: #FFFFFF;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
       flex-shrink: 0;
     }
 
-    .ios-switch input {
-      opacity: 0;
-      width: 0;
-      height: 0;
-    }
-
-    .ios-slider {
-      position: absolute;
-      cursor: pointer;
-      inset: 0;
-      background-color: #CBD5E1;
-      border-radius: 26px;
-      transition: 0.2s;
-    }
-
-    .ios-slider:before {
-      position: absolute;
-      content: "";
-      height: 20px;
-      width: 20px;
-      left: 3px;
-      bottom: 3px;
-      background-color: white;
-      border-radius: 50%;
-      transition: 0.2s;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.15);
-    }
-
-    input:checked + .ios-slider {
-      background-color: var(--primary);
-    }
-
-    input:checked + .ios-slider:before {
-      transform: translateX(18px);
-    }
-
-    /* Freemium Tier Card */
-    .tier-box {
-      background: linear-gradient(135deg, #1E293B, #0F172A);
-      border-radius: 22px;
-      padding: 20px;
-      color: #FFF;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .tier-header {
+    /* Perfil */
+    .user-row {
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      margin-bottom: 10px;
+      gap: 12px;
+      padding: 4px 0;
     }
 
-    .tier-title {
-      font-size: 17px;
-      font-weight: 800;
+    .avatar-circle {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: var(--dark-blue);
+      color: #FFFFFF;
+      font-size: 20px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
     }
 
-    .tier-pill {
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 0.05em;
-      text-transform: uppercase;
-      background: rgba(245, 158, 11, 0.2);
-      color: #FBBF24;
-      padding: 4px 10px;
+    .plan-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
       border-radius: 20px;
-      border: 1px solid rgba(245, 158, 11, 0.4);
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
     }
 
-    .tier-desc {
-      font-size: 13px;
-      color: #94A3B8;
-      line-height: 1.4;
-      margin-bottom: 14px;
-    }
-
-    .tier-features {
+    .plan-list {
       list-style: none;
       display: flex;
       flex-direction: column;
       gap: 6px;
-      font-size: 12px;
-      color: #E2E8F0;
-      margin-bottom: 16px;
-    }
-
-    .tier-features li {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .tier-btn {
-      width: 100%;
-      min-height: 44px;
-      border-radius: 12px;
-      border: none;
-      background: #FFF;
-      color: #0F172A;
       font-size: 13px;
-      font-weight: 700;
+      color: var(--text-muted);
+    }
+
+    .premium-card {
+      background: linear-gradient(150deg, var(--dark-blue) 0%, var(--blue-jeans) 100%);
+      border-radius: 22px;
+      padding: 18px;
+      color: #FFFFFF;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .premium-card p {
+      font-size: 13px;
+      color: var(--sky-blue);
+      line-height: 1.45;
+    }
+
+    .btn-light {
+      width: 100%;
+      min-height: 46px;
+      border-radius: 14px;
+      border: none;
+      background: #FFFFFF;
+      color: var(--dark-blue);
+      font-size: 14px;
+      font-weight: 600;
       cursor: pointer;
     }
 
-    /* Bottom Navigation Bar */
+    /* Bottom navigation (5 pestañas) */
     .bottom-nav {
       height: 68px;
       background: var(--surface);
       border-top: 1px solid var(--border);
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      padding: 6px 10px;
+      grid-template-columns: repeat(5, 1fr);
+      padding: 4px 4px 6px;
       flex-shrink: 0;
-      z-index: 10;
     }
 
     .nav-btn {
+      border: none;
+      background: transparent;
+      color: var(--text-dim);
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 4px;
-      background: transparent;
-      border: none;
-      color: var(--text-muted);
+      gap: 3px;
+      font-size: 10.5px;
+      font-weight: 500;
       cursor: pointer;
-      font-size: 11px;
-      font-weight: 600;
-      transition: all 0.15s;
-    }
-
-    .nav-btn svg {
-      width: 22px;
-      height: 22px;
-      stroke-width: 2;
+      min-height: 44px;
+      border-radius: 10px;
+      transition: color 0.15s;
     }
 
     .nav-btn.active {
-      color: var(--primary);
+      color: var(--black-cherry);
+      font-weight: 600;
     }
 
-    .nav-btn.active svg {
-      stroke-width: 2.3;
+    .nav-btn svg {
+      width: 21px;
+      height: 21px;
+      stroke-width: 2;
     }
 
-    /* FULLSCREEN ALERT OVERLAY (Immersive & Accessible) */
-    .alert-takeover {
+    /* Modales */
+    .modal-overlay {
       position: absolute;
       inset: 0;
-      z-index: 50;
+      z-index: 40;
       display: none;
       flex-direction: column;
-      align-items: center;
-      justify-content: space-between;
-      padding: 48px 24px 36px;
-      text-align: center;
-      color: #FFF;
-      animation: alertSlideIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      padding: 24px 20px;
+      animation: fadeIn 0.2s ease-out;
     }
 
-    .alert-takeover.active {
+    .modal-overlay.active {
       display: flex;
     }
 
-    @keyframes alertSlideIn {
-      from { opacity: 0; transform: scale(0.96); }
-      to { opacity: 1; transform: scale(1); }
+    /* Alerta Fullscreen (Dark blue) */
+    .alert-modal {
+      background: linear-gradient(180deg, #0D243B 0%, #153654 100%);
+      color: #FFFFFF;
+      justify-content: space-between;
+      text-align: center;
     }
 
-    .alert-badge-top {
-      font-size: 12px;
-      font-weight: 800;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      padding: 6px 14px;
-      border-radius: 20px;
-      background: rgba(0, 0, 0, 0.25);
-      backdrop-filter: blur(8px);
-    }
-
-    .alert-main-content {
+    .alert-center {
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 16px;
+      gap: 14px;
+      margin: auto 0;
     }
 
-    .alert-visual-card {
-      width: 140px;
-      height: 140px;
-      border-radius: 36px;
-      background: rgba(255, 255, 255, 0.18);
-      border: 3px solid rgba(255, 255, 255, 0.8);
+    .alert-icon-ring {
+      width: 96px;
+      height: 96px;
+      border-radius: 50%;
+      background: rgba(167, 202, 223, 0.15);
+      border: 2px solid var(--sky-blue);
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-      animation: alertPulse 1.2s infinite alternate;
+      font-size: 44px;
     }
 
-    @keyframes alertPulse {
-      0% { transform: scale(0.96); }
-      100% { transform: scale(1.05); }
+    .alert-kicker {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--sky-blue);
     }
 
-    .alert-title-text {
+    .alert-heading {
       font-family: var(--font-title);
-      font-size: 32px;
+      font-size: 30px;
       font-weight: 700;
       line-height: 1.15;
     }
 
-    .alert-sub-text {
-      font-size: 15px;
-      opacity: 0.92;
-      max-width: 290px;
-      line-height: 1.4;
+    .alert-sub {
+      font-size: 14px;
+      color: var(--silver-stars);
+      max-width: 280px;
     }
 
-    .alert-direction-box {
+    .alert-info-box {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(167, 202, 223, 0.25);
+      border-radius: 18px;
+      padding: 14px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      text-align: left;
+      margin-top: 6px;
+    }
+
+    .alert-info-row {
       display: flex;
       align-items: center;
       gap: 12px;
-      background: rgba(0, 0, 0, 0.25);
-      padding: 10px 18px;
-      border-radius: 18px;
-      backdrop-filter: blur(8px);
-    }
-
-    .compass-arrow {
-      width: 38px;
-      height: 38px;
-      border-radius: 50%;
-      border: 2px solid #FFF;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: transform 0.4s ease;
-    }
-
-    .vibrate-indicator {
       font-size: 13px;
-      opacity: 0.85;
-      font-weight: 600;
     }
 
-    .dismiss-alert-btn {
+    .alert-info-row strong {
+      display: block;
+      font-size: 14px;
+      color: #FFFFFF;
+    }
+
+    .alert-info-row span {
+      color: var(--sky-blue);
+      font-size: 12px;
+    }
+
+    .alert-dismiss-btn {
       width: 100%;
-      min-height: 56px;
-      border-radius: 18px;
-      border: none;
-      background: #FFFFFF;
-      color: #0F172A;
-      font-size: 17px;
-      font-weight: 800;
-      cursor: pointer;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-    }
-
-    /* FULLSCREEN BIG TEXT MODAL */
-    .big-text-modal {
-      position: absolute;
-      inset: 0;
-      background: #0F172A;
-      color: #FFF;
-      z-index: 60;
-      display: none;
-      flex-direction: column;
-      padding: 36px 24px 28px;
-      justify-content: space-between;
-    }
-
-    .big-text-modal.active {
-      display: flex;
-    }
-
-    .big-text-header {
-      font-size: 13px;
-      color: #94A3B8;
+      min-height: 50px;
+      border-radius: 25px;
+      border: 1.5px solid var(--sky-blue);
+      background: transparent;
+      color: #FFFFFF;
+      font-size: 15px;
       font-weight: 600;
-      display: flex;
-      align-items: center;
+      cursor: pointer;
+    }
+
+    /* Pizarrón Pantalla Grande */
+    .big-text-modal {
+      background: var(--dark-blue);
+      color: #FFFFFF;
       justify-content: space-between;
     }
 
     .big-text-body {
-      font-size: 34px;
-      font-weight: 800;
+      font-size: clamp(30px, 8vw, 48px);
+      font-weight: 700;
       line-height: 1.25;
-      letter-spacing: -0.01em;
+      text-align: center;
+      margin: auto 0;
       word-break: break-word;
     }
 
-    .big-text-close {
-      width: 100%;
-      min-height: 52px;
-      border-radius: 16px;
-      border: 2px solid rgba(255, 255, 255, 0.3);
-      background: transparent;
-      color: #FFF;
+    /* Sheet interno (Transcripción en vivo, Perfiles, Ajustes) */
+    .sheet-modal {
+      background: var(--bg);
+      color: var(--dark-blue);
+      gap: 14px;
+      overflow-y: auto;
+    }
+
+    .transcript-box {
+      background: var(--dark-blue);
+      color: #FFFFFF;
+      border-radius: 18px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      min-height: 280px;
+      flex: 1;
+      overflow-y: auto;
+    }
+
+    .t-line {
+      padding: 8px 10px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .t-line.name-hit {
+      background: var(--sky-blue);
+      color: var(--dark-blue);
+    }
+
+    .t-who {
+      font-size: 11px;
+      font-weight: 600;
+      opacity: 0.85;
+      margin-bottom: 2px;
+    }
+
+    .t-text {
       font-size: 16px;
-      font-weight: 700;
+      line-height: 1.45;
+    }
+
+    /* Switch iOS accesible */
+    .switch {
+      position: relative;
+      width: 48px;
+      height: 28px;
+      flex-shrink: 0;
+    }
+
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      inset: 0;
+      background: var(--silver-stars);
+      border-radius: 28px;
       cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .slider::before {
+      content: "";
+      position: absolute;
+      width: 22px;
+      height: 22px;
+      left: 3px;
+      top: 3px;
+      background: #FFFFFF;
+      border-radius: 50%;
+      transition: transform 0.2s;
+    }
+
+    .switch input:checked + .slider {
+      background: var(--blue-jeans);
+    }
+
+    .switch input:checked + .slider::before {
+      transform: translateX(20px);
+    }
+
+    .switch input:disabled + .slider {
+      opacity: 0.7;
+      cursor: not-allowed;
+    }
+
+    .toast {
+      position: absolute;
+      bottom: 80px;
+      left: 18px;
+      right: 18px;
+      background: var(--dark-blue);
+      color: #FFFFFF;
+      padding: 10px 14px;
+      border-radius: 14px;
+      font-size: 12px;
+      font-weight: 500;
+      text-align: center;
+      z-index: 60;
+      display: none;
+      box-shadow: 0 10px 24px rgba(13, 36, 59, 0.25);
+    }
+
+    .toast.show {
+      display: block;
     }
   </style>
 </head>
 <body>
-
-  <div class="app-viewport" id="mobileApp">
-    <!-- Status Bar -->
+  <div class="app-viewport">
+    <!-- Status bar -->
     <div class="status-bar">
       <span id="clockDisplay">09:41</span>
       <div class="notch-pill"></div>
-      <div style="display: flex; align-items: center; gap: 6px;">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12.55a11 11 0 0 1 14.08 0"></path><path d="M1.42 9a16 16 0 0 1 21.16 0"></path><path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path><circle cx="12" cy="20" r="1"></circle></svg>
-        <span style="font-size: 11px;">5G</span>
-      </div>
+      <span>5G</span>
     </div>
 
-    <!-- App Header -->
-    <header class="app-header">
-      <div class="brand">
-        <div class="brand-icon">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12h3l2-6 4 12 3-9 2 3h6"></path></svg>
-        </div>
-        <div>
-          <h1 class="brand-title">Ziva</h1>
-        </div>
-      </div>
-      <button class="profile-pill" id="profilePickerBtn" onclick="cycleProfile()">
-        <span class="dot"></span>
-        <span id="activeProfileLabel">Universidad</span>
-      </button>
-    </header>
-
-    <!-- App Body (Tabs) -->
+    <!-- Contenido principal -->
     <main class="app-content">
 
-      <!-- ================= TAB 1: RADAR / ESCUCHA ACTIVA ================= -->
-      <section class="tab-view active" id="tab-radar">
-        <!-- Live Status Hero -->
-        <div class="listening-hero">
-          <div class="radar-visualizer">
-            <div class="radar-ring" id="ring1"></div>
-            <div class="radar-ring" id="ring2"></div>
-            <div class="radar-ring" id="ring3"></div>
-            <div class="radar-core" id="radarCoreIcon">
-              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
-            </div>
+      <!-- ================= 1. INICIO ================= -->
+      <section class="tab-view active" id="tab-inicio">
+        <div class="brand-row">
+          <div class="brand-lockup">
+            <svg width="32" height="32" viewBox="0 0 40 40" fill="none" aria-hidden="true">
+              <path d="M12 28C9.5 25 8 21.5 8 17.5C8 11 13 6 19.5 6C25.5 6 30 10.5 30 16.5C30 20 28.5 22.5 26 24.5" stroke="#A7CADF" stroke-width="3.2" stroke-linecap="round"/>
+              <path d="M13 31.5C14.5 33.5 17 34.5 19.5 33.5" stroke="#A7CADF" stroke-width="3.2" stroke-linecap="round"/>
+              <path d="M14.5 16.5C14.5 13 17 11 19.5 11C22.2 11 24 12.8 24 15.2C24 17.5 21.5 18.5 20.5 20.5" stroke="#325978" stroke-width="3" stroke-linecap="round"/>
+              <circle cx="20.2" cy="24.5" r="1.6" fill="#325978"/>
+              <rect x="24" y="25" width="12" height="9" rx="4.5" fill="#F3F7FA" stroke="#325978" stroke-width="2.2"/>
+              <circle cx="27.5" cy="29.5" r="1" fill="#325978"/>
+              <circle cx="30" cy="29.5" r="1" fill="#325978"/>
+              <circle cx="32.5" cy="29.5" r="1" fill="#325978"/>
+              <path d="M29 6.5L32 3.5M32.5 10L36.5 8.5M33.5 14L37.5 14.5" stroke="#730F1A" stroke-width="2.4" stroke-linecap="round"/>
+            </svg>
+            <span class="brand-name">Ziva</span>
           </div>
-          <div class="listening-status" id="listenStateTitle">Escuchando entorno</div>
-          <div class="listening-sub" id="listenStateSub">Detectando sirenas, alarmas, choques y mención de tu nombre «Daniela»</div>
-
-          <!-- Dynamic Audio Meter -->
-          <div class="audio-meter" id="audioMeter">
-            <div class="meter-bar" style="height: 8px;"></div>
-            <div class="meter-bar" style="height: 14px;"></div>
-            <div class="meter-bar" style="height: 20px;"></div>
-            <div class="meter-bar" style="height: 12px;"></div>
-            <div class="meter-bar" style="height: 18px;"></div>
-            <div class="meter-bar" style="height: 9px;"></div>
-          </div>
-
-          <button class="listen-toggle-btn" onclick="toggleListening()">
-            <span id="toggleListenIcon">⏸</span>
-            <span id="toggleListenLabel">Pausar escucha</span>
+          <button type="button" class="icon-btn" aria-label="Ir a perfil" onclick="switchTab('perfil')">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-6 8-6s8 2 8 6"/></svg>
           </button>
         </div>
 
-        <!-- Simulation Quick Tester -->
-        <div class="demo-bar-wrapper">
-          <div class="demo-bar-title">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polygon points="10 8 16 12 10 16 10 8"></polygon></svg>
-            <span>Simulador de alertas (MVP)</span>
+        <button type="button" class="profile-selector-btn" onclick="openProfileModal()">
+          <span id="activeProfileIcon">🎓</span>
+          <span id="activeProfileLabel">Universidad</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+
+        <div class="radar-card">
+          <div class="radar-rings" id="radarRings">
+            <div class="radar-circle c1"></div>
+            <div class="radar-circle c2"></div>
+            <div class="radar-circle c3"></div>
+            <div class="wave-bars" id="waveBars">
+              <div class="wave-bar" style="height: 16px;"></div>
+              <div class="wave-bar" style="height: 30px;"></div>
+              <div class="wave-bar" style="height: 40px;"></div>
+              <div class="wave-bar" style="height: 26px;"></div>
+              <div class="wave-bar" style="height: 18px;"></div>
+            </div>
           </div>
-          <div class="demo-bar-desc">Toca cualquier sonido para probar la respuesta sensorial:</div>
-          <div class="demo-chips-grid">
-            <button class="demo-chip chip-critico" onclick="triggerAlert('sirena')">
-              <div class="icon-wrap">🚑</div>
-              <span>Sirena</span>
-            </button>
-            <button class="demo-chip chip-critico" onclick="triggerAlert('alarma')">
-              <div class="icon-wrap">🚨</div>
-              <span>Alarma</span>
-            </button>
-            <button class="demo-chip chip-critico" onclick="triggerAlert('disparo')">
-              <div class="icon-wrap">💥</div>
-              <span>Disparo</span>
-            </button>
-            <button class="demo-chip chip-alto" onclick="triggerAlert('choque')">
-              <div class="icon-wrap">🚗</div>
-              <span>Choque</span>
-            </button>
-            <button class="demo-chip chip-alto" onclick="triggerAlert('nombre')">
-              <div class="icon-wrap">🗣</div>
-              <span>«Daniela»</span>
-            </button>
-            <button class="demo-chip chip-alto" onclick="triggerAlert('grito')">
-              <div class="icon-wrap">📢</div>
-              <span>Grito</span>
-            </button>
-          </div>
+          <div class="radar-title" id="listenTitle">Escuchando tu entorno</div>
+          <div class="radar-sub" id="listenSub">Detectando sonidos importantes y la mención de tu nombre («Daniela»).</div>
+          <button type="button" class="status-pill-btn" onclick="toggleListening()">
+            <span class="status-dot" id="listenDot"></span>
+            <span id="listenBtnText">Monitoreo activo</span>
+          </button>
         </div>
 
-        <!-- Events Feed -->
-        <div>
-          <div class="section-label">
-            <span>Últimos eventos detectados</span>
-            <span style="font-size: 11px; font-weight: 500;" id="eventCountBadge">3 eventos</span>
+        <!-- Simulador de las 7 alertas de sección 10 -->
+        <div class="sim-box">
+          <div class="section-kicker">
+            <span>Probar alertas (MVP)</span>
+            <span>7 sonidos</span>
           </div>
-          <div class="events-card" id="eventsContainer">
-            <div class="event-item">
-              <div class="event-badge" style="background: var(--danger-light); color: var(--danger);">🚑</div>
-              <div class="event-info">
-                <div class="event-title">Sirena de emergencia</div>
-                <div class="event-meta">
-                  <span>Izquierda (270°)</span>
-                  <span>·</span>
-                  <span>88 dB</span>
-                </div>
-              </div>
-              <span class="event-time">11:42</span>
-            </div>
-            <div class="event-item">
-              <div class="event-badge" style="background: var(--primary-light); color: var(--primary);">🗣</div>
-              <div class="event-info">
-                <div class="event-title">Mención de tu nombre</div>
-                <div class="event-meta">
-                  <span>Atrás (180°)</span>
-                  <span>·</span>
-                  <span>Voz cercana</span>
-                </div>
-              </div>
-              <span class="event-time">10:15</span>
-            </div>
-            <div class="event-item">
-              <div class="event-badge" style="background: var(--warning-light); color: var(--warning);">🚗</div>
-              <div class="event-info">
-                <div class="event-title">Claxon / Accidente</div>
-                <div class="event-meta">
-                  <span>Derecha (90°)</span>
-                  <span>·</span>
-                  <span>78 dB</span>
-                </div>
-              </div>
-              <span class="event-time">09:05</span>
-            </div>
-          </div>
+          <div class="sim-grid" id="simGrid"></div>
+        </div>
+
+        <!-- Últimos eventos -->
+        <div class="section-kicker">
+          <span>Últimos eventos</span>
+          <span id="historyScopeBadge">Plan Free · 3 máx.</span>
+        </div>
+
+        <div id="featuredAlertSlot"></div>
+        <div class="alert-feed-list" id="eventsFeed"></div>
+        <div class="limit-banner" id="historyLimitBanner">
+          <span>Historial completo disponible en Premium</span>
+          <button type="button" class="link-btn" onclick="switchTab('perfil')">Ver Premium</button>
         </div>
       </section>
 
+      <!-- ================= 2. TRANSCRIPCIONES ================= -->
+      <section class="tab-view" id="tab-transcripciones">
+        <div class="screen-header">
+          <h1 class="screen-title">Transcripciones</h1>
+          <button type="button" class="icon-btn" aria-label="Buscar transcripciones" onclick="toggleTranscriptSearch()">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          </button>
+        </div>
 
-      <!-- ================= TAB 2: TRANSCRIBIR ================= -->
-      <section class="tab-view" id="tab-voice">
-        <div class="transcribe-controls">
-          <div class="mode-toggle">
-            <button class="mode-btn active" id="modeClassBtn" onclick="setTranscribeMode('clase')">Clase / Reunión</button>
-            <button class="mode-btn" id="modeConvBtn" onclick="setTranscribeMode('conv')">1 a 1</button>
-          </div>
-          <div class="font-stepper">
-            <button class="stepper-btn" onclick="adjustFontSize(-2)">A−</button>
-            <button class="stepper-btn" onclick="adjustFontSize(2)">A+</button>
+        <div class="search-box" id="transcriptSearchBox" style="display: none;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" id="transcriptSearchInput" placeholder="Buscar por título o tema..." oninput="renderTranscripts()">
+        </div>
+
+        <button type="button" class="btn-primary" onclick="openLiveTranscript()">
+          <span>+ Nueva transcripción en vivo</span>
+        </button>
+
+        <div class="segmented">
+          <button type="button" class="seg-btn active" id="segCarpetas" onclick="setTranscriptTab('carpetas')">Carpetas</button>
+          <button type="button" class="seg-btn" id="segRecientes" onclick="setTranscriptTab('recientes')">Recientes</button>
+        </div>
+
+        <div id="transcriptsBody" class="folder-list"></div>
+      </section>
+
+      <!-- ================= 3. HABLAR ================= -->
+      <section class="tab-view" id="tab-hablar">
+        <div class="screen-header">
+          <h1 class="screen-title">Hablar</h1>
+        </div>
+
+        <div class="message-card">
+          <label for="hablarInput" style="font-size: 13px; font-weight: 600; color: var(--text-muted);">Escribe tu mensaje</label>
+          <textarea id="hablarInput" class="msg-textarea" placeholder="Ej. Hola, soy sordo. ¿Me lo puedes escribir?"></textarea>
+          <div class="msg-actions">
+            <button type="button" class="btn-primary" onclick="showBigMessage()">Mostrar en grande</button>
+            <button type="button" class="btn-outline" onclick="speakMessage()" aria-label="Leer en voz alta">🔊 Voz</button>
+            <button type="button" class="btn-outline" onclick="clearMessage()">Borrar</button>
           </div>
         </div>
 
-        <div class="transcript-window" id="transcriptWindow">
-          <div class="transcript-bubble speaker-prof">
-            <span class="speaker-tag">Profesora (Economía)</span>
-            <div class="dialogue-text">Buenos días a todos. Hoy analizaremos el flujo de caja operativo y los costos fijos.</div>
-          </div>
-          <div class="transcript-bubble speaker-prof">
-            <span class="speaker-tag">Profesora</span>
-            <div class="dialogue-text">Es importante recordar que la depreciación no representa una salida real de efectivo.</div>
-          </div>
-          <div class="transcript-bubble speaker-mate">
-            <span class="speaker-tag">Compañero</span>
-            <div class="dialogue-text">¿Y cómo afecta eso al pago de impuestos del trimestre?</div>
-          </div>
-          <div class="transcript-bubble speaker-prof speaker-name-alert" id="nameMentionBubble">
-            <span class="speaker-tag">🔔 Mención detectada</span>
-            <div class="dialogue-text"><strong>Daniela</strong>, ¿puedes compartir tu conclusión del caso práctico con el grupo?</div>
-          </div>
-
-          <div class="transcript-status-bar">
-            <div style="display: flex; align-items: center; gap: 6px;">
-              <span class="live-dot" id="liveDotIndicator"></span>
-              <span id="transcribeStatusText">Escuchando en vivo…</span>
-            </div>
-            <span>Micrófono frontal</span>
-          </div>
+        <div class="section-kicker"><span>Frases rápidas</span></div>
+        <div class="phrases-grid">
+          <button type="button" class="phrase-chip" onclick="pickPhrase('Hola, soy sordo/a')">Hola, soy sordo/a</button>
+          <button type="button" class="phrase-chip" onclick="pickPhrase('Gracias')">Gracias</button>
+          <button type="button" class="phrase-chip" onclick="pickPhrase('¿Puedes decirlo más lento?')">¿Puedes decirlo más lento?</button>
+          <button type="button" class="phrase-chip" onclick="pickPhrase('¿Puedes escribirlo?')">¿Puedes escribirlo?</button>
+          <button type="button" class="phrase-chip" onclick="pickPhrase('No te entendí')">No te entendí</button>
+          <button type="button" class="phrase-chip" onclick="pickPhrase('Necesito ayuda')">Necesito ayuda</button>
         </div>
 
-        <button class="transcribe-action-btn" id="toggleTranscribeBtn" onclick="toggleTranscriptionEngine()">
-          <span id="transcribeBtnIcon">⏸</span>
-          <span id="transcribeBtnLabel">Pausar transcripción</span>
+        <button type="button" class="sos-btn" onclick="triggerSos()">
+          <span>S.O.S. · Auxilio inmediato</span>
         </button>
       </section>
 
-
-      <!-- ================= TAB 3: COMUNICAR ================= -->
-      <section class="tab-view" id="tab-chat">
-        <div class="quick-write-card">
-          <div style="display: flex; justify-content: space-between; align-items: center;">
-            <span style="font-size: 13px; font-weight: 700;">Escribe tu mensaje</span>
-            <span style="font-size: 11px; color: var(--text-muted);">Se ve a distancia</span>
-          </div>
-          <textarea class="quick-textarea" id="userMsgInput" placeholder="Ej. ¿Me puedes escribir la indicación, por favor?"></textarea>
-          <div class="write-btn-row">
-            <button class="show-big-btn" onclick="showBigText()">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"></path></svg>
-              <span>Mostrar en pantalla grande</span>
-            </button>
-            <button class="clear-btn" onclick="clearMessage()">Borrar</button>
+      <!-- ================= 4. APRENDE (DUDAS Y DEFINICIONES) ================= -->
+      <section class="tab-view" id="tab-aprende">
+        <div class="screen-header">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="var(--blue-jeans)"><path d="M12 2l2.4 7.2L22 12l-7.6 2.8L12 22l-2.4-7.2L2 12l7.6-2.8z"/></svg>
+            <h1 class="screen-title">Dudas y Definiciones</h1>
           </div>
         </div>
+        <p class="chat-subtitle">Pregunta a Ziva y recibe explicaciones claras al instante sobre refranes, modismos o palabras.</p>
 
-        <div>
-          <div class="section-label">Frases rápidas de apoyo</div>
-          <div class="phrases-list">
-            <div class="phrase-item" onclick="usePhrase('Soy sordo/a. ¿Me lo puedes escribir aquí, por favor?')">
-              <div class="phrase-badge">✍️</div>
-              <span>Soy sordo/a. ¿Me lo puedes escribir?</span>
-            </div>
-            <div class="phrase-item" onclick="usePhrase('¿Me lo repite más despacio mirándome de frente?')">
-              <div class="phrase-badge">👀</div>
-              <span>¿Me lo repite de frente más despacio?</span>
-            </div>
-            <div class="phrase-item" onclick="usePhrase('¿Dónde está el aula de la clase o la salida?')">
-              <div class="phrase-badge">📍</div>
-              <span>¿Dónde está el aula o la salida?</span>
-            </div>
-            <div class="phrase-item" onclick="usePhrase('¿Cuánto cuesta en total?')">
-              <div class="phrase-badge">💳</div>
-              <span>¿Cuánto cuesta en total?</span>
-            </div>
-          </div>
+        <div class="quick-topics">
+          <button type="button" class="topic-chip" onclick="askPreset('¿Qué significa dar el avión?')">Dar el avión</button>
+          <button type="button" class="topic-chip" onclick="askPreset('¿Qué es ponerse las pilas?')">Ponerse las pilas</button>
+          <button type="button" class="topic-chip" onclick="askPreset('¿Qué significa hipoacusia?')">Hipoacusia</button>
+          <button type="button" class="topic-chip" onclick="askPreset('¿Qué es SASMEX?')">SASMEX</button>
         </div>
 
-        <button class="sos-emergency-btn" onclick="triggerSos()">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
-          <span>SOS · Enviar auxilio y ubicación</span>
-        </button>
+        <div class="chat-thread" id="chatThread">
+          <div class="bubble user">¿Qué significa “camarón que se duerme se lo lleva la corriente”?</div>
+          <div class="bubble ai">Es un refrán que significa que, si no aprovechas una oportunidad a tiempo o te distraes, alguien más la tomará o perderás tu turno.</div>
+        </div>
+
+        <form class="chat-input-bar" onsubmit="sendDoubt(event)" style="margin-top: auto;">
+          <input type="text" id="doubtInput" placeholder="Escribe tu duda..." autocomplete="off">
+          <button type="submit" class="chat-send-btn" aria-label="Enviar duda">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><polyline points="9 18 15 12 9 6"/></svg>
+          </button>
+        </form>
       </section>
 
+      <!-- ================= 5. PERFIL ================= -->
+      <section class="tab-view" id="tab-perfil">
+        <div class="screen-header">
+          <h1 class="screen-title">Perfil</h1>
+          <button type="button" class="icon-btn" aria-label="Configurar alertas" onclick="openAlertsConfigModal()">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          </button>
+        </div>
 
-      <!-- ================= TAB 4: AJUSTES & FREEMIUM (MVP) ================= -->
-      <section class="tab-view" id="tab-settings">
-        <!-- Freemium status banner -->
-        <div class="tier-box">
-          <div class="tier-header">
-            <span class="tier-title" id="tierCardTitle">Plan Gratuito</span>
-            <span class="tier-pill" id="tierCardBadge">Esencial Activo</span>
+        <div class="user-row">
+          <div class="avatar-circle">D</div>
+          <div>
+            <div style="font-size: 16px; font-weight: 600;">Daniela R.</div>
+            <span id="profilePlanBadge" style="display: inline-block; font-size: 12px; font-weight: 500; padding: 2px 10px; border-radius: 10px; background: var(--surface-subtle); color: var(--blue-jeans);">Plan Free</span>
           </div>
-          <div class="tier-desc">Las alertas críticas de seguridad son un derecho humano y siempre serán gratuitas.</div>
-          <ul class="tier-features" id="tierFeatureList">
-            <li>✓ Alertas críticas (sirenas, disparos, alarmas)</li>
-            <li>✓ Detección de nombre («Daniela»)</li>
-            <li>✓ Transcripción básica de aula</li>
-            <li>✓ Vibración háptica en móvil</li>
+        </div>
+
+        <div class="plan-card">
+          <div style="font-size: 14px; font-weight: 600;">Tu plan</div>
+          <div style="font-size: 15px; font-weight: 600;" id="planCurrentTitle">✓ Ziva Free</div>
+          <ul class="plan-list" id="planBenefitsList">
+            <li>✓ Alertas críticas ilimitadas (siempre activas)</li>
+            <li>✓ Detección de tu nombre</li>
+            <li>✓ Transcripción básica en vivo</li>
+            <li>✓ 2 perfiles de uso (Casa y Universidad)</li>
           </ul>
-          <button class="tier-btn" id="upgradeToggleBtn" onclick="toggleTier()">Probar funciones Premium</button>
+          <button type="button" class="btn-outline" onclick="openAlertsConfigModal()">Configurar alertas</button>
         </div>
 
-        <div>
-          <div class="section-label">Alertas configurables (MVP)</div>
-          <div class="alerts-config-list">
-            <div class="config-row">
-              <div class="config-info">
-                <span class="config-name">Sirenas de ambulancia y policía</span>
-                <span class="config-tag"><span class="prio-dot" style="background: var(--danger);"></span> Crítica · Vibración triple</span>
-              </div>
-              <label class="ios-switch">
-                <input type="checkbox" checked onchange="toggleAlertState('sirena')">
-                <span class="ios-slider"></span>
-              </label>
-            </div>
-
-            <div class="config-row">
-              <div class="config-info">
-                <span class="config-name">Disparos y detonaciones</span>
-                <span class="config-tag"><span class="prio-dot" style="background: var(--danger);"></span> Crítica · Vibración continua</span>
-              </div>
-              <label class="ios-switch">
-                <input type="checkbox" checked onchange="toggleAlertState('disparo')">
-                <span class="ios-slider"></span>
-              </label>
-            </div>
-
-            <div class="config-row">
-              <div class="config-info">
-                <span class="config-name">Alarmas de incendio y evacuación</span>
-                <span class="config-tag"><span class="prio-dot" style="background: var(--danger);"></span> Crítica · Pulso largo</span>
-              </div>
-              <label class="ios-switch">
-                <input type="checkbox" checked onchange="toggleAlertState('alarma')">
-                <span class="ios-slider"></span>
-              </label>
-            </div>
-
-            <div class="config-row">
-              <div class="config-info">
-                <span class="config-name">Accidentes y choques de auto</span>
-                <span class="config-tag"><span class="prio-dot" style="background: var(--warning);"></span> Alta · Pulso rápido</span>
-              </div>
-              <label class="ios-switch">
-                <input type="checkbox" checked onchange="toggleAlertState('choque')">
-                <span class="ios-slider"></span>
-              </label>
-            </div>
-
-            <div class="config-row">
-              <div class="config-info">
-                <span class="config-name">Mención de tu nombre propio</span>
-                <span class="config-tag"><span class="prio-dot" style="background: var(--primary);"></span> Alta · Doble pulso suave</span>
-              </div>
-              <label class="ios-switch">
-                <input type="checkbox" checked onchange="toggleAlertState('nombre')">
-                <span class="ios-slider"></span>
-              </label>
-            </div>
-
-            <div class="config-row">
-              <div class="config-info">
-                <span class="config-name">Gritos o peleas cercanas</span>
-                <span class="config-tag"><span class="prio-dot" style="background: var(--warning);"></span> Alta · 3 pulsos</span>
-              </div>
-              <label class="ios-switch">
-                <input type="checkbox" checked onchange="toggleAlertState('grito')">
-                <span class="ios-slider"></span>
-              </label>
-            </div>
-          </div>
-        </div>
-
-        <div>
-          <div class="section-label">Perfiles de sensibilidad</div>
-          <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px;">
-            <button class="demo-chip" style="border-color: var(--primary); background: var(--primary-light); color: var(--primary-dark);" onclick="selectProfile('Universidad')">
-              <strong>Universidad</strong>
-              <span style="font-size: 11px; color: var(--text-muted);">Voz + Sirenas</span>
-            </button>
-            <button class="demo-chip" onclick="selectProfile('Calle')">
-              <strong>Calle</strong>
-              <span style="font-size: 11px; color: var(--text-muted);">Tráfico + Choques</span>
-            </button>
-            <button class="demo-chip" onclick="selectProfile('Casa')">
-              <strong>Casa</strong>
-              <span style="font-size: 11px; color: var(--text-muted);">Timbre + Alarmas</span>
-            </button>
-            <button class="demo-chip" onclick="selectProfile('Trabajo')">
-              <strong>Trabajo</strong>
-              <span style="font-size: 11px; color: var(--text-muted);">Reuniones</span>
-            </button>
-          </div>
+        <div class="premium-card">
+          <div style="font-size: 16px; font-weight: 600;">👑 Ziva Premium</div>
+          <p>Historial completo de alertas, carpetas y búsqueda en transcripciones, perfiles ilimitados y selección de alertas.</p>
+          <button type="button" class="btn-light" id="togglePremiumBtn" onclick="togglePremium()">Mejorar a Premium (Demo)</button>
         </div>
       </section>
-
     </main>
 
-    <!-- Bottom Navigation Bar -->
-    <nav class="bottom-nav">
-      <button class="nav-btn active" id="btn-tab-radar" onclick="switchTab('radar')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg>
-        <span>Radar</span>
+    <!-- Barra inferior de 5 pestañas -->
+    <nav class="bottom-nav" aria-label="Navegación principal">
+      <button type="button" class="nav-btn active" id="nav-inicio" onclick="switchTab('inicio')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 10.5L12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>
+        <span>Inicio</span>
       </button>
-      <button class="nav-btn" id="btn-tab-voice" onclick="switchTab('voice')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line></svg>
-        <span>Voz</span>
+      <button type="button" class="nav-btn" id="nav-transcripciones" onclick="switchTab('transcripciones')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 7a2 2 0 0 1 2-2h5l2 2h7a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+        <span>Transcrip.</span>
       </button>
-      <button class="nav-btn" id="btn-tab-chat" onclick="switchTab('chat')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+      <button type="button" class="nav-btn" id="nav-hablar" onclick="switchTab('hablar')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
         <span>Hablar</span>
       </button>
-      <button class="nav-btn" id="btn-tab-settings" onclick="switchTab('settings')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
-        <span>Ajustes</span>
+      <button type="button" class="nav-btn" id="nav-aprende" onclick="switchTab('aprende')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 3l2.2 6.8L21 12l-6.8 2.2L12 21l-2.2-6.8L3 12l6.8-2.2z"/></svg>
+        <span>Aprende</span>
+      </button>
+      <button type="button" class="nav-btn" id="nav-perfil" onclick="switchTab('perfil')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-6 8-6s8 2 8 6"/></svg>
+        <span>Perfil</span>
       </button>
     </nav>
 
-    <!-- FULLSCREEN EMERGENCY TAKEOVER MODAL -->
-    <div class="alert-takeover" id="alertModal">
-      <div class="alert-badge-top" id="alertModalBadge">Prioridad Crítica</div>
-      
-      <div class="alert-main-content">
-        <div class="alert-visual-card">
-          <span style="font-size: 64px;" id="alertModalIcon">🚑</span>
-        </div>
-        <div class="alert-title-text" id="alertModalTitle">Sirena de emergencia</div>
-        <div class="alert-sub-text" id="alertModalSub">Ambulancia o vehículo de rescate en aproximación rápida</div>
+    <!-- Toast de avisos -->
+    <div class="toast" id="toastMsg" role="status" aria-live="polite"></div>
 
-        <div class="alert-direction-box">
-          <div class="compass-arrow" id="alertCompassArrow">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="#FFFFFF"><polygon points="12 2 19 21 12 17 5 21 12 2"></polygon></svg>
-          </div>
-          <div style="text-align: left;">
-            <div style="font-size: 11px; opacity: 0.85;">Dirección estimada</div>
-            <div style="font-size: 15px; font-weight: 800;" id="alertDirText">A la izquierda (270°)</div>
-          </div>
-        </div>
-
-        <div class="vibrate-indicator" id="alertVibText">⚡ Patrón: 3 pulsos largos</div>
+    <!-- ================= MODAL ALERTA FULLSCREEN (sin botón de mapa) ================= -->
+    <div class="modal-overlay alert-modal" id="alertModal" role="dialog" aria-modal="true" aria-labelledby="alertModalTitle">
+      <div style="text-align: left;">
+        <button type="button" class="icon-btn" style="background: rgba(255,255,255,0.1); border-color: rgba(167,202,223,0.3); color: #FFF;" onclick="dismissAlert()" aria-label="Cerrar alerta">✕</button>
       </div>
 
-      <button class="dismiss-alert-btn" onclick="dismissAlert()">Entendido · Silenciar</button>
+      <div class="alert-center">
+        <div class="alert-icon-ring" id="alertModalIcon">🚑</div>
+        <div class="alert-kicker" id="alertModalPrio">Alerta Crítica</div>
+        <h2 class="alert-heading" id="alertModalTitle">Ambulancia</h2>
+        <p class="alert-sub" id="alertModalSub">Se detectó una sirena cerca.</p>
+
+        <div class="alert-info-box">
+          <div class="alert-info-row">
+            <span style="font-size: 20px;">🧭</span>
+            <div>
+              <span>Dirección</span>
+              <strong id="alertModalDir">Izquierda (270°)</strong>
+            </div>
+          </div>
+          <div class="alert-info-row">
+            <span style="font-size: 20px;">📳</span>
+            <div>
+              <span>Vibración</span>
+              <strong id="alertModalVib">Triple</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <button type="button" class="alert-dismiss-btn" onclick="dismissAlert()">Entendido</button>
     </div>
 
-    <!-- FULLSCREEN BIG TEXT -->
-    <div class="big-text-modal" id="bigTextModal">
-      <div class="big-text-header">
-        <span>Muestra esta pantalla a la otra persona</span>
-        <button onclick="hideBigText()" style="background:none; border:none; color:#FFF; font-size:18px; cursor:pointer;">✕</button>
+    <!-- ================= MODAL PIZARRÓN PANTALLA GRANDE ================= -->
+    <div class="modal-overlay big-text-modal" id="bigTextModal" role="dialog" aria-modal="true">
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <span style="font-size: 13px; color: var(--sky-blue);">Muestra esta pantalla a la otra persona</span>
+        <button type="button" class="icon-btn" style="background: rgba(255,255,255,0.1); border-color: rgba(167,202,223,0.3); color: #FFF;" onclick="hideBigMessage()" aria-label="Cerrar pantalla">✕</button>
       </div>
-      <div class="big-text-body" id="bigTextContent">
-        ¿Me puedes escribir aquí lo que dijiste, por favor?
+      <div class="big-text-body" id="bigTextContent"></div>
+      <button type="button" class="alert-dismiss-btn" onclick="hideBigMessage()">Cerrar</button>
+    </div>
+
+    <!-- ================= SHEET: TRANSCRIPCIÓN EN VIVO ================= -->
+    <div class="modal-overlay sheet-modal" id="liveTranscriptModal" role="dialog" aria-modal="true">
+      <div class="screen-header">
+        <h2 class="screen-title" style="font-size: 22px;">Transcripción en vivo</h2>
+        <button type="button" class="icon-btn" onclick="closeLiveTranscript()" aria-label="Cerrar">✕</button>
       </div>
-      <button class="big-text-close" onclick="hideBigText()">Cerrar pantalla</button>
+
+      <div style="display: flex; gap: 8px; align-items: center;">
+        <div class="segmented" style="flex: 1;">
+          <button type="button" class="seg-btn active" id="modeClaseBtn" onclick="setLiveMode('clase')">Clase / Reunión</button>
+          <button type="button" class="seg-btn" id="modeConvBtn" onclick="setLiveMode('conv')">1 a 1</button>
+        </div>
+        <button type="button" class="icon-btn" onclick="changeLiveFont(-2)" aria-label="Reducir texto">A−</button>
+        <button type="button" class="icon-btn" onclick="changeLiveFont(2)" aria-label="Aumentar texto">A+</button>
+      </div>
+
+      <div class="transcript-box" id="liveTranscriptBox"></div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+        <button type="button" class="btn-outline" id="livePauseBtn" onclick="toggleLivePause()">⏸ Pausar</button>
+        <button type="button" class="btn-primary" onclick="saveLiveTranscript()">Guardar nota</button>
+      </div>
+    </div>
+
+    <!-- ================= SHEET: PERFILES DE USO ================= -->
+    <div class="modal-overlay sheet-modal" id="profileModal" role="dialog" aria-modal="true">
+      <div class="screen-header">
+        <h2 class="screen-title" style="font-size: 22px;">Perfiles de uso</h2>
+        <button type="button" class="icon-btn" onclick="closeModal('profileModal')" aria-label="Cerrar">✕</button>
+      </div>
+      <p style="font-size: 13px; color: var(--text-muted);" id="profileModalHint"></p>
+      <div class="folder-list" id="profilesList"></div>
+    </div>
+
+    <!-- ================= SHEET: CONFIGURAR ALERTAS ================= -->
+    <div class="modal-overlay sheet-modal" id="alertsConfigModal" role="dialog" aria-modal="true">
+      <div class="screen-header">
+        <h2 class="screen-title" style="font-size: 22px;">Alertas sonoras</h2>
+        <button type="button" class="icon-btn" onclick="closeModal('alertsConfigModal')" aria-label="Cerrar">✕</button>
+      </div>
+      <p style="font-size: 13px; color: var(--text-muted);" id="alertsConfigHint"></p>
+      <div class="folder-list" id="alertsConfigList"></div>
     </div>
   </div>
 
   <script>
-    // System State
+    const ALERTS = {
+      nombre:  { key: 'nombre',  chip: '🗣 Nombre («Daniela»)', title: 'Mención de tu nombre', sub: 'Alguien cercano dijo «Daniela».', dir: 'Atrás (180°)', icon: '🗣', prio: 'Alta', critica: false, vib: 'Doble pulso suave', pattern: [180, 120, 180], tone: 620 },
+      timbre:  { key: 'timbre',  chip: '🔔 Timbre',             title: 'Timbre de puerta',     sub: 'Alguien toca el timbre cerca.',    dir: 'Frente (0°)',  icon: '🔔', prio: 'Media', critica: false, vib: '2 pulsos medios',   pattern: [250, 150, 250], tone: 540 },
+      sirena:  { key: 'sirena',  chip: '🚑 Ambulancia / Policía', title: 'Ambulancia / Policía', sub: 'Se detectó una sirena cerca.',    dir: 'Izquierda (270°)', icon: '🚑', prio: 'Crítica', critica: true, vib: 'Triple pulso largo', pattern: [600, 200, 600, 200, 600], tone: 860 },
+      grito:   { key: 'grito',   chip: '📢 Grito',              title: 'Grito detectado',      sub: 'Voz humana con tono de alerta.',   dir: 'Derecha (90°)', icon: '📢', prio: 'Alta', critica: false, vib: '3 pulsos cortos',   pattern: [220, 110, 220, 110, 220], tone: 720 },
+      claxon:  { key: 'claxon',  chip: '🚗 Claxon',             title: 'Claxon de vehículo',   sub: 'Vehículo cercano tocando claxon.', dir: 'Derecha (90°)', icon: '🚗', prio: 'Alta', critica: false, vib: 'Pulsos rápidos',    pattern: [140, 80, 140, 80, 140], tone: 460 },
+      llanto:  { key: 'llanto',  chip: '👶 Llanto de bebé',     title: 'Llanto de bebé',       sub: 'Sonido continuo de llanto.',       dir: 'Frente (30°)',  icon: '👶', prio: 'Media', critica: false, vib: 'Pulso suave repetido', pattern: [300, 200, 300], tone: 500 },
+      alarma:  { key: 'alarma',  chip: '🚨 Alarma sismo / incendio', title: 'Alarma de emergencia', sub: 'Posible sismo o incendio: sigue ruta de evacuación.', dir: 'Todo el edificio (360°)', icon: '🚨', prio: 'Crítica', critica: true, vib: 'Vibración continua', pattern: [1000, 150, 1000], tone: 960 }
+    };
+
+    const PROFILES = [
+      { name: 'Universidad', icon: '🎓', desc: 'Prioriza voz, nombre y alarmas', free: true },
+      { name: 'Casa',        icon: '🏠', desc: 'Timbre, llanto de bebé y alarmas', free: true },
+      { name: 'Trabajo',     icon: '💼', desc: 'Reuniones y mención de nombre', free: false },
+      { name: 'Calle',       icon: '🚶', desc: 'Sirenas, claxon y alertas viales', free: false }
+    ];
+
+    const DEMO_LINES = [
+      { who: 'Profesora (Economía)', text: 'Buenos días a todos. Hoy revisaremos el flujo de caja operativo.' },
+      { who: 'Compañero', text: '¿Esto incluye también los gastos fijos del trimestre?' },
+      { who: 'Profesora', text: 'Daniela, ¿puedes compartir tu conclusión del caso práctico?', nameHit: true },
+      { who: 'Profesora', text: 'Para el viernes entreguen el resumen en la plataforma.' }
+    ];
+
+    const DOUBT_DICT = {
+      'avion': '«Dar el avión» significa fingir que escuchas o pones atención a alguien, pero en realidad ignoras lo que dice.',
+      'pilas': '«Ponerse las pilas» quiere decir activar tu energía, concentrarte y empezar a hacer algo con ganas.',
+      'hipoacusia': 'La hipoacusia es la pérdida parcial de la capacidad de escuchar en uno o ambos oídos. Puede ser leve, moderada o severa.',
+      'sasmex': 'SASMEX es el Sistema de Alerta Sísmica Mexicano que emite el sonido oficial segundos antes de un sismo fuerte.'
+    };
+
     const state = {
+      tab: 'inicio',
       isListening: true,
-      profile: 'Universidad',
       isPremium: false,
-      fontSize: 16,
-      transcribing: true,
-      audioCtx: null,
-      activeAlerts: {
-        sirena: true,
-        disparo: true,
-        alarma: true,
-        choque: true,
-        nombre: true,
-        grito: true
-      }
+      profile: 'Universidad',
+      activeAlerts: { nombre: true, timbre: true, sirena: true, grito: true, claxon: true, llanto: true, alarma: true },
+      history: [
+        { key: 'sirena', title: 'Ambulancia detectada', dir: 'Izquierda (270°)', when: 'Hace 2 min', icon: '🚑', critica: true },
+        { key: 'nombre', title: 'Mención de tu nombre', dir: 'Atrás (180°)', when: 'Hace 18 min', icon: '🗣', critica: false },
+        { key: 'claxon', title: 'Claxon de vehículo', dir: 'Derecha (90°)', when: '09:15', icon: '🚗', critica: false },
+        { key: 'timbre', title: 'Timbre de puerta', dir: 'Frente (0°)', when: 'Ayer', icon: '🔔', critica: false }
+      ],
+      transcriptTab: 'carpetas',
+      folders: [
+        { id: 'clases', name: 'Clases', items: ['Economía · Flujo de caja', 'Contabilidad · Balance general'] },
+        { id: 'reuniones', name: 'Reuniones', items: ['Equipo Enactus · Pitch'] },
+        { id: 'proyectos', name: 'Proyectos', items: ['Diseño prototipo Ziva'] },
+        { id: 'personales', name: 'Personales', items: ['Cita médica'] }
+      ],
+      recents: [
+        { title: 'Clase de Economía (demo)', date: 'Hoy · 09:30', preview: 'Daniela, ¿puedes compartir tu conclusión?' }
+      ],
+      live: { running: false, shown: 0, fontSize: 16, mode: 'clase', timer: null },
+      audioCtx: null
     };
 
-    // Alert Definitions based on the MVP PDF
-    const ALERT_TYPES = {
-      sirena: {
-        title: 'Sirena de emergencia',
-        sub: 'Ambulancia o patrulla policial detectada cerca',
-        prio: 'Crítica',
-        color: '#DC2626',
-        icon: '🚑',
-        dir: 'A la izquierda (270°)',
-        deg: 270,
-        vib: '⚡ 3 pulsos largos continuos',
-        vibPattern: [600, 200, 600, 200, 600],
-        tone: 850
-      },
-      alarma: {
-        title: 'Alarma de incendio / evacuación',
-        sub: 'Señal de evacuación activa en el edificio',
-        prio: 'Crítica',
-        color: '#B91C1C',
-        icon: '🚨',
-        dir: 'En todo el edificio (360°)',
-        deg: 0,
-        vib: '⚡ Pulso continuo sostenido',
-        vibPattern: [1000, 150, 1000],
-        tone: 980
-      },
-      disparo: {
-        title: 'Disparo o detonación',
-        sub: 'Sonido seco de alta intensidad detectado',
-        prio: 'Crítica',
-        color: '#991B1B',
-        icon: '💥',
-        dir: 'Atrás a la derecha (140°)',
-        deg: 140,
-        vib: '⚡ Vibración urgente máxima',
-        vibPattern: [800, 100, 800],
-        tone: 250
-      },
-      choque: {
-        title: 'Accidente o choque vial',
-        sub: 'Impacto fuerte de vehículo en la vía',
-        prio: 'Alta',
-        color: '#D97706',
-        icon: '🚗',
-        dir: 'Al frente a la derecha (45°)',
-        deg: 45,
-        vib: '⚡ Pulsos rápidos intermitentes',
-        vibPattern: [150, 80, 150, 80, 150],
-        tone: 450
-      },
-      nombre: {
-        title: 'Alguien dijo tu nombre',
-        sub: 'Voz cercana pronunció «Daniela»',
-        prio: 'Alta',
-        color: '#2563EB',
-        icon: '🗣',
-        dir: 'Atrás de ti (180°)',
-        deg: 180,
-        vib: '⚡ Doble pulso suave',
-        vibPattern: [200, 120, 200],
-        tone: 600
-      },
-      grito: {
-        title: 'Grito o discusión detectada',
-        sub: 'Voz humana con tono de alarma detectada',
-        prio: 'Alta',
-        color: '#EA580C',
-        icon: '📢',
-        dir: 'A la derecha (90°)',
-        deg: 90,
-        vib: '⚡ 3 pulsos medios',
-        vibPattern: [300, 150, 300, 150, 300],
-        tone: 700
-      }
-    };
-
-    // Profiles
-    const PROFILES = ['Universidad', 'Calle', 'Casa', 'Trabajo'];
-
-    // Clock
+    /* Reloj y barras de onda */
     function updateClock() {
-      const now = new Date();
-      const h = String(now.getHours()).padStart(2, '0');
-      const m = String(now.getMinutes()).padStart(2, '0');
-      document.getElementById('clockDisplay').textContent = `${h}:${m}`;
+      const d = new Date();
+      document.getElementById('clockDisplay').textContent =
+        String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
     }
     setInterval(updateClock, 1000);
     updateClock();
 
-    // Sound synth for browser demo
-    function playTone(freq, duration = 300) {
-      try {
-        if (!state.audioCtx) {
-          state.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        }
-        if (state.audioCtx.state === 'suspended') {
-          state.audioCtx.resume();
-        }
-        const osc = state.audioCtx.createOscillator();
-        const gain = state.audioCtx.createGain();
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(freq, state.audioCtx.currentTime);
-        gain.gain.setValueAtTime(0.2, state.audioCtx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.001, state.audioCtx.currentTime + (duration / 1000));
-        osc.connect(gain);
-        gain.connect(state.audioCtx.destination);
-        osc.start();
-        osc.stop(state.audioCtx.currentTime + (duration / 1000));
-      } catch (e) {
-        // AudioContext may be blocked before gesture
-      }
-    }
-
-    // Audio Visualizer Simulation
-    function animateAudioMeter() {
+    setInterval(() => {
       if (!state.isListening) return;
-      const bars = document.querySelectorAll('.meter-bar');
-      bars.forEach(bar => {
-        const rand = Math.floor(Math.random() * 20) + 6;
-        bar.style.height = `${rand}px`;
+      document.querySelectorAll('#waveBars .wave-bar').forEach(bar => {
+        bar.style.height = (Math.floor(Math.random() * 28) + 12) + 'px';
       });
-    }
-    setInterval(animateAudioMeter, 180);
+    }, 200);
 
-    // Switch Tabs
-    function switchTab(tabId) {
-      document.querySelectorAll('.tab-view').forEach(t => t.classList.remove('active'));
+    function showToast(msg) {
+      const el = document.getElementById('toastMsg');
+      el.textContent = msg;
+      el.classList.add('show');
+      clearTimeout(el._t);
+      el._t = setTimeout(() => el.classList.remove('show'), 2600);
+    }
+
+    /* Navegación */
+    function switchTab(id) {
+      state.tab = id;
+      document.querySelectorAll('.tab-view').forEach(v => v.classList.remove('active'));
       document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-      
-      const targetView = document.getElementById(`tab-${tabId}`);
-      const targetBtn = document.getElementById(`btn-tab-${tabId}`);
-      if (targetView) targetView.classList.add('active');
-      if (targetBtn) targetBtn.classList.add('active');
+      document.getElementById('tab-' + id).classList.add('active');
+      document.getElementById('nav-' + id).classList.add('active');
     }
 
-    // Toggle Listening
+    function openModal(id) { document.getElementById(id).classList.add('active'); }
+    function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+
+    /* Escucha y simulador de 7 alertas */
     function toggleListening() {
       state.isListening = !state.isListening;
-      const core = document.getElementById('radarCoreIcon');
-      const title = document.getElementById('listenStateTitle');
-      const sub = document.getElementById('listenStateSub');
-      const lbl = document.getElementById('toggleListenLabel');
-      const icon = document.getElementById('toggleListenIcon');
+      const rings = document.getElementById('radarRings');
+      const dot = document.getElementById('listenDot');
+      rings.classList.toggle('paused', !state.isListening);
+      dot.classList.toggle('paused', !state.isListening);
+      document.getElementById('listenTitle').textContent = state.isListening ? 'Escuchando tu entorno' : 'Monitoreo en pausa';
+      document.getElementById('listenSub').textContent = state.isListening
+        ? 'Detectando sonidos importantes y la mención de tu nombre («Daniela»).'
+        : 'Reactiva la escucha para recibir alertas y vibraciones.';
+      document.getElementById('listenBtnText').textContent = state.isListening ? 'Monitoreo activo' : 'En pausa · Reanudar';
+    }
 
-      if (state.isListening) {
-        core.classList.remove('paused');
-        title.textContent = 'Escuchando entorno';
-        sub.textContent = 'Detectando sirenas, alarmas, choques y mención de tu nombre «Daniela»';
-        lbl.textContent = 'Pausar escucha';
-        icon.textContent = '⏸';
-      } else {
-        core.classList.add('paused');
-        title.textContent = 'Escucha pausada';
-        sub.textContent = 'No se enviarán alertas ni vibraciones mientras esté en pausa.';
-        lbl.textContent = 'Reanudar escucha';
-        icon.textContent = '▶';
+    function playTone(freq) {
+      try {
+        if (!state.audioCtx) state.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        if (state.audioCtx.state === 'suspended') state.audioCtx.resume();
+        const osc = state.audioCtx.createOscillator();
+        const gain = state.audioCtx.createGain();
+        osc.frequency.value = freq;
+        gain.gain.setValueAtTime(0.12, state.audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, state.audioCtx.currentTime + 0.35);
+        osc.connect(gain); gain.connect(state.audioCtx.destination);
+        osc.start(); osc.stop(state.audioCtx.currentTime + 0.35);
+      } catch (_) {}
+    }
+
+    function triggerAlert(key) {
+      if (!state.isListening) { showToast('El monitoreo está en pausa'); return; }
+      if (state.isPremium && !state.activeAlerts[key]) { showToast('Esta alerta está desactivada en Ajustes'); return; }
+      const a = ALERTS[key];
+      if (!a) return;
+
+      if (navigator.vibrate) { try { navigator.vibrate(a.pattern); } catch (_) {} }
+      playTone(a.tone);
+
+      document.getElementById('alertModalIcon').textContent = a.icon;
+      document.getElementById('alertModalPrio').textContent = 'Alerta · Prioridad ' + a.prio;
+      document.getElementById('alertModalTitle').textContent = a.title;
+      document.getElementById('alertModalSub').textContent = a.sub;
+      document.getElementById('alertModalDir').textContent = a.dir;
+      document.getElementById('alertModalVib').textContent = a.vib;
+      openModal('alertModal');
+
+      const d = new Date();
+      const when = String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
+      state.history.unshift({ key, title: a.title, dir: a.dir, when, icon: a.icon, critica: a.critica });
+      renderHome();
+    }
+
+    function dismissAlert() { closeModal('alertModal'); }
+
+    function renderHome() {
+      const p = PROFILES.find(x => x.name === state.profile) || PROFILES[0];
+      document.getElementById('activeProfileIcon').textContent = p.icon;
+      document.getElementById('activeProfileLabel').textContent = p.name;
+
+      // Chips de 7 alertas
+      const grid = document.getElementById('simGrid');
+      const keys = Object.keys(ALERTS);
+      grid.innerHTML = keys.map((k, idx) => {
+        const a = ALERTS[k];
+        const disabled = state.isPremium && !state.activeAlerts[k];
+        const cls = ['sim-chip', a.critica ? 'critica' : '', idx === keys.length - 1 ? 'sim-chip-wide' : '', disabled ? 'disabled-chip' : ''].join(' ');
+        return `<button type="button" class="${cls}" onclick="triggerAlert('${k}')">${a.chip}</button>`;
+      }).join('');
+
+      // Historial: 3 máx en Free, completo en Premium
+      const visible = state.isPremium ? state.history : state.history.slice(0, 3);
+      document.getElementById('historyScopeBadge').textContent = state.isPremium
+        ? `Premium · ${state.history.length} eventos`
+        : 'Plan Free · 3 máx.';
+      document.getElementById('historyLimitBanner').style.display = state.isPremium ? 'none' : 'flex';
+
+      const slot = document.getElementById('featuredAlertSlot');
+      const feed = document.getElementById('eventsFeed');
+
+      if (visible.length === 0) {
+        slot.innerHTML = '';
+        feed.innerHTML = '<div class="feed-row"><div class="feed-info"><div class="feed-title">Sin alertas recientes</div></div></div>';
+        return;
       }
-    }
 
-    // Trigger Alert (Emergency Screen Takeover)
-    function triggerAlert(type) {
-      const alertData = ALERT_TYPES[type];
-      if (!alertData) return;
-
-      // Haptic Vibration if supported on mobile
-      if (navigator.vibrate) {
-        try { navigator.vibrate(alertData.vibPattern); } catch(e){}
-      }
-
-      // Demo sound tone
-      playTone(alertData.tone, 500);
-
-      // Populate Modal
-      const modal = document.getElementById('alertModal');
-      modal.style.background = alertData.color;
-      document.getElementById('alertModalBadge').textContent = `Prioridad ${alertData.prio}`;
-      document.getElementById('alertModalIcon').textContent = alertData.icon;
-      document.getElementById('alertModalTitle').textContent = alertData.title;
-      document.getElementById('alertModalSub').textContent = alertData.sub;
-      document.getElementById('alertDirText').textContent = alertData.dir;
-      document.getElementById('alertVibText').textContent = alertData.vib;
-      document.getElementById('alertCompassArrow').style.transform = `rotate(${alertData.deg}deg)`;
-
-      modal.classList.add('active');
-
-      // Add to event timeline feed
-      prependEvent(alertData);
-    }
-
-    function dismissAlert() {
-      document.getElementById('alertModal').classList.remove('active');
-    }
-
-    function prependEvent(alertData) {
-      const now = new Date();
-      const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
-      const container = document.getElementById('eventsContainer');
-      const item = document.createElement('div');
-      item.className = 'event-item';
-      item.innerHTML = `
-        <div class="event-badge" style="background: rgba(37,99,235,0.1); color: ${alertData.color};">${alertData.icon}</div>
-        <div class="event-info">
-          <div class="event-title">${alertData.title}</div>
-          <div class="event-meta">
-            <span>${alertData.dir.split('(')[0]}</span>
-            <span>·</span>
-            <span>Ahora</span>
+      const first = visible[0];
+      slot.innerHTML = `
+        <div class="featured-alert-card" onclick="triggerAlert('${first.key}')">
+          <div class="featured-alert-icon">${first.icon}</div>
+          <div class="feed-info">
+            <div class="feed-title">${first.title}</div>
+            <div class="feed-meta">${first.when} · ${first.dir}</div>
           </div>
+          <span style="color: var(--black-cherry); font-weight: 600;">›</span>
+        </div>`;
+
+      feed.innerHTML = visible.slice(1).map(ev => `
+        <div class="feed-row">
+          <div class="feed-badge">${ev.icon}</div>
+          <div class="feed-info">
+            <div class="feed-title">${ev.title}</div>
+            <div class="feed-meta">${ev.dir}</div>
+          </div>
+          <span class="feed-meta">${ev.when}</span>
         </div>
-        <span class="event-time">${timeStr}</span>
-      `;
-      container.insertBefore(item, container.firstChild);
+      `).join('');
     }
 
-    // Transcription Engine
-    function setTranscribeMode(mode) {
-      document.getElementById('modeClassBtn').classList.toggle('active', mode === 'clase');
-      document.getElementById('modeConvBtn').classList.toggle('active', mode === 'conv');
-    }
-
-    function adjustFontSize(delta) {
-      state.fontSize = Math.max(13, Math.min(26, state.fontSize + delta));
-      document.querySelectorAll('.dialogue-text').forEach(el => {
-        el.style.fontSize = `${state.fontSize}px`;
-      });
-    }
-
-    function toggleTranscriptionEngine() {
-      state.transcribing = !state.transcribing;
-      const btn = document.getElementById('toggleTranscribeBtn');
-      const dot = document.getElementById('liveDotIndicator');
-      const txt = document.getElementById('transcribeStatusText');
-      const lbl = document.getElementById('transcribeBtnLabel');
-
-      if (state.transcribing) {
-        btn.classList.remove('active');
-        dot.style.display = 'inline-block';
-        txt.textContent = 'Escuchando en vivo…';
-        lbl.textContent = 'Pausar transcripción';
-      } else {
-        btn.classList.add('active');
-        dot.style.display = 'none';
-        txt.textContent = 'Transcripción en pausa';
-        lbl.textContent = 'Reanudar transcripción';
-      }
-    }
-
-    // Communication & Big Text
-    function showBigText() {
-      const input = document.getElementById('userMsgInput');
-      const val = input.value.trim() || 'Soy una persona sorda. Por favor escribe aquí tu respuesta.';
-      document.getElementById('bigTextContent').textContent = val;
-      document.getElementById('bigTextModal').classList.add('active');
-    }
-
-    function hideBigText() {
-      document.getElementById('bigTextModal').classList.remove('active');
-    }
-
-    function clearMessage() {
-      document.getElementById('userMsgInput').value = '';
-    }
-
-    function usePhrase(text) {
-      document.getElementById('userMsgInput').value = text;
-      showBigText();
-    }
-
-    function triggerSos() {
-      document.getElementById('bigTextContent').textContent = '⚠️ EMERGENCIA: Soy sordo/a. Necesito ayuda inmediata. Ya he compartido mi ubicación con mis contactos y servicios de auxilio.';
-      document.getElementById('bigTextModal').classList.add('active');
-      if (navigator.vibrate) {
-        try { navigator.vibrate([1000, 200, 1000, 200, 1000]); } catch(e){}
-      }
-    }
-
-    // Profiles & Freemium
-    function cycleProfile() {
-      const currentIdx = PROFILES.indexOf(state.profile);
-      const nextIdx = (currentIdx + 1) % PROFILES.length;
-      selectProfile(PROFILES[nextIdx]);
+    /* Perfiles de uso */
+    function openProfileModal() {
+      document.getElementById('profileModalHint').textContent = state.isPremium
+        ? 'Plan Premium activo: tienes acceso a todos los perfiles.'
+        : 'Plan Free: incluye 2 perfiles (Universidad y Casa). Los demás son Premium.';
+      const list = document.getElementById('profilesList');
+      list.innerHTML = PROFILES.map(p => {
+        const locked = !state.isPremium && !p.free;
+        const active = state.profile === p.name;
+        return `
+          <button type="button" class="folder-card ${locked ? 'locked' : ''}" style="${active ? 'border-color: var(--blue-jeans); background: var(--surface-subtle);' : ''}" onclick="selectProfile('${p.name}')">
+            <span style="font-size: 22px;">${p.icon}</span>
+            <div class="feed-info">
+              <div class="feed-title">${p.name} ${active ? '· Activo' : ''}</div>
+              <div class="feed-meta">${p.desc}</div>
+            </div>
+            ${locked ? '<span class="premium-pill">Premium</span>' : ''}
+          </button>`;
+      }).join('');
+      openModal('profileModal');
     }
 
     function selectProfile(name) {
+      const p = PROFILES.find(x => x.name === name);
+      if (!state.isPremium && p && !p.free) {
+        showToast('Este perfil requiere Ziva Premium (actívalo en Perfil)');
+        return;
+      }
       state.profile = name;
-      document.getElementById('activeProfileLabel').textContent = name;
+      closeModal('profileModal');
+      renderHome();
     }
 
-    function toggleTier() {
-      state.isPremium = !state.isPremium;
-      const title = document.getElementById('tierCardTitle');
-      const badge = document.getElementById('tierCardBadge');
-      const btn = document.getElementById('upgradeToggleBtn');
-      const list = document.getElementById('tierFeatureList');
+    /* Transcripciones */
+    function setTranscriptTab(t) {
+      state.transcriptTab = t;
+      document.getElementById('segCarpetas').classList.toggle('active', t === 'carpetas');
+      document.getElementById('segRecientes').classList.toggle('active', t === 'recientes');
+      renderTranscripts();
+    }
 
-      if (state.isPremium) {
-        title.textContent = 'Plan Premium Activo';
-        badge.textContent = 'Licencia Campus / Pro';
-        badge.style.background = 'rgba(16, 185, 129, 0.2)';
-        badge.style.color = '#34D399';
-        badge.style.borderColor = 'rgba(16, 185, 129, 0.4)';
-        btn.textContent = 'Volver a Plan Gratuito (Demo)';
-        list.innerHTML = `
-          <li>✓ Transcripción ilimitada en la nube</li>
-          <li>✓ Historial completo y búsqueda</li>
-          <li>✓ Perfiles ilimitados (Casa, Campus, Trabajo, Calle)</li>
-          <li>✓ Patrones y sonidos de vibración personalizados</li>
-          <li>✓ Integración futura con Smartwatch</li>
-        `;
+    function toggleTranscriptSearch() {
+      if (!state.isPremium) {
+        showToast('La búsqueda en transcripciones es función Premium');
+        return;
+      }
+      const box = document.getElementById('transcriptSearchBox');
+      box.style.display = box.style.display === 'none' ? 'flex' : 'none';
+    }
+
+    function renderTranscripts() {
+      const body = document.getElementById('transcriptsBody');
+      const q = (document.getElementById('transcriptSearchInput').value || '').trim().toLowerCase();
+
+      if (state.transcriptTab === 'carpetas') {
+        const cards = state.folders
+          .filter(f => !q || f.name.toLowerCase().includes(q))
+          .map(f => `
+            <button type="button" class="folder-card ${state.isPremium ? '' : 'locked'}" onclick="openFolder('${f.id}')">
+              <span style="font-size: 20px;">📁</span>
+              <div class="feed-info">
+                <div class="feed-title">${f.name}</div>
+                <div class="feed-meta">${f.items.length} transcripciones</div>
+              </div>
+              ${state.isPremium ? '<span style="color: var(--text-muted);">›</span>' : '<span class="premium-pill">Premium</span>'}
+            </button>`).join('');
+
+        const newBtn = state.isPremium
+          ? '<button type="button" class="btn-outline" onclick="createFolder()">+ Nueva carpeta</button>'
+          : '<div class="limit-banner"><span>Clasificación por carpetas disponible en Premium</span><button type="button" class="link-btn" onclick="switchTab(\'perfil\')">Probar</button></div>';
+
+        body.innerHTML = cards + newBtn;
       } else {
-        title.textContent = 'Plan Gratuito';
-        badge.textContent = 'Esencial Activo';
-        badge.style.background = 'rgba(245, 158, 11, 0.2)';
-        badge.style.color = '#FBBF24';
-        badge.style.borderColor = 'rgba(245, 158, 11, 0.4)';
-        btn.textContent = 'Probar funciones Premium';
-        list.innerHTML = `
-          <li>✓ Alertas críticas (sirenas, disparos, alarmas)</li>
-          <li>✓ Detección de nombre («Daniela»)</li>
-          <li>✓ Transcripción básica de aula</li>
-          <li>✓ Vibración háptica en móvil</li>
-        `;
+        const items = state.recents
+          .filter(r => !q || r.title.toLowerCase().includes(q) || r.preview.toLowerCase().includes(q))
+          .map(r => `
+            <div class="feed-row">
+              <div class="feed-badge">📝</div>
+              <div class="feed-info">
+                <div class="feed-title">${r.title}</div>
+                <div class="feed-meta">${r.date} · ${r.preview}</div>
+              </div>
+            </div>`).join('');
+        body.innerHTML = items || '<div class="feed-row"><div class="feed-info"><div class="feed-title">Sin coincidencias</div></div></div>';
       }
     }
 
-    function toggleAlertState(key) {
-      state.activeAlerts[key] = !state.activeAlerts[key];
+    function openFolder(id) {
+      if (!state.isPremium) {
+        showToast('Activa la demo Premium en Perfil para abrir carpetas');
+        return;
+      }
+      const f = state.folders.find(x => x.id === id);
+      if (f) showToast(f.name + ': ' + f.items.join(' · '));
     }
+
+    function createFolder() {
+      const idx = state.folders.length + 1;
+      state.folders.push({ id: 'extra-' + idx, name: 'Carpeta ' + idx, items: ['Nueva nota'] });
+      renderTranscripts();
+      showToast('Carpeta creada');
+    }
+
+    /* Transcripción en vivo (disponible en Free) */
+    function openLiveTranscript() {
+      state.live.shown = 0;
+      state.live.running = true;
+      document.getElementById('livePauseBtn').textContent = '⏸ Pausar';
+      openModal('liveTranscriptModal');
+      renderLiveTranscript();
+      clearInterval(state.live.timer);
+      advanceLiveTranscript();
+      state.live.timer = setInterval(advanceLiveTranscript, 1600);
+    }
+
+    function advanceLiveTranscript() {
+      if (!state.live.running) return;
+      if (state.live.shown < DEMO_LINES.length) {
+        state.live.shown++;
+        const last = DEMO_LINES[state.live.shown - 1];
+        if (last.nameHit && navigator.vibrate) { try { navigator.vibrate([180, 100, 180]); } catch (_) {} }
+        renderLiveTranscript();
+      } else {
+        clearInterval(state.live.timer);
+        state.live.running = false;
+        document.getElementById('livePauseBtn').textContent = '↻ Repetir';
+      }
+    }
+
+    function renderLiveTranscript() {
+      const box = document.getElementById('liveTranscriptBox');
+      if (state.live.shown === 0) {
+        box.innerHTML = '<div style="font-size: 14px; color: var(--sky-blue);">Escuchando voz...</div>';
+        return;
+      }
+      box.innerHTML = DEMO_LINES.slice(0, state.live.shown).map(l => `
+        <div class="t-line ${l.nameHit ? 'name-hit' : ''}">
+          <div class="t-who">${l.nameHit ? '🔔 Mención detectada · ' : ''}${l.who}</div>
+          <div class="t-text" style="font-size: ${state.live.fontSize}px;">${l.text}</div>
+        </div>`).join('');
+    }
+
+    function toggleLivePause() {
+      if (state.live.shown >= DEMO_LINES.length && !state.live.running) {
+        openLiveTranscript();
+        return;
+      }
+      state.live.running = !state.live.running;
+      document.getElementById('livePauseBtn').textContent = state.live.running ? '⏸ Pausar' : '▶ Reanudar';
+    }
+
+    function setLiveMode(m) {
+      state.live.mode = m;
+      document.getElementById('modeClaseBtn').classList.toggle('active', m === 'clase');
+      document.getElementById('modeConvBtn').classList.toggle('active', m === 'conv');
+    }
+
+    function changeLiveFont(delta) {
+      state.live.fontSize = Math.max(14, Math.min(26, state.live.fontSize + delta));
+      renderLiveTranscript();
+    }
+
+    function saveLiveTranscript() {
+      state.recents.unshift({
+        title: state.live.mode === 'clase' ? 'Clase grabada' : 'Conversación 1 a 1',
+        date: 'Ahora',
+        preview: 'Daniela, ¿puedes compartir tu conclusión?'
+      });
+      closeLiveTranscript();
+      setTranscriptTab('recientes');
+      showToast('Transcripción guardada en Recientes');
+    }
+
+    function closeLiveTranscript() {
+      clearInterval(state.live.timer);
+      state.live.running = false;
+      closeModal('liveTranscriptModal');
+    }
+
+    /* Hablar */
+    function showBigMessage(custom) {
+      const val = custom || document.getElementById('hablarInput').value.trim() || 'Hola, soy sordo/a. ¿Me lo puedes escribir?';
+      document.getElementById('bigTextContent').textContent = val;
+      openModal('bigTextModal');
+    }
+
+    function hideBigMessage() { closeModal('bigTextModal'); }
+    function clearMessage() { document.getElementById('hablarInput').value = ''; }
+
+    function pickPhrase(txt) {
+      document.getElementById('hablarInput').value = txt;
+      showBigMessage(txt);
+    }
+
+    function speakMessage() {
+      const txt = document.getElementById('hablarInput').value.trim();
+      if (!txt) { showToast('Escribe un mensaje primero'); return; }
+      if ('speechSynthesis' in window) {
+        const u = new SpeechSynthesisUtterance(txt);
+        u.lang = 'es-MX';
+        window.speechSynthesis.cancel();
+        window.speechSynthesis.speak(u);
+      } else {
+        showToast('Síntesis de voz no disponible en este navegador');
+      }
+    }
+
+    function triggerSos() {
+      if (navigator.vibrate) { try { navigator.vibrate([800, 150, 800, 150, 800]); } catch (_) {} }
+      showBigMessage('S.O.S. · Soy una persona sorda. Necesito ayuda inmediata. Ubicación compartida.');
+    }
+
+    /* Aprende: Dudas y Definiciones */
+    function appendChat(role, text) {
+      const thread = document.getElementById('chatThread');
+      const div = document.createElement('div');
+      div.className = 'bubble ' + role;
+      div.textContent = text;
+      thread.appendChild(div);
+      thread.scrollTop = thread.scrollHeight;
+    }
+
+    function replyDoubt(q) {
+      const low = q.toLowerCase();
+      let ans = 'En esta versión demo respondo con ejemplos guardados. En la app final Ziva usará IA para explicarte cualquier frase o palabra en lenguaje claro.';
+      for (const k of Object.keys(DOUBT_DICT)) {
+        if (low.includes(k)) { ans = DOUBT_DICT[k]; break; }
+      }
+      if (low.includes('camar')) {
+        ans = 'Significa que si te distraes o tardas demasiado, pierdes la oportunidad y alguien más la aprovecha.';
+      }
+      setTimeout(() => appendChat('ai', ans), 220);
+    }
+
+    function sendDoubt(e) {
+      e.preventDefault();
+      const input = document.getElementById('doubtInput');
+      const q = input.value.trim();
+      if (!q) return;
+      appendChat('user', q);
+      input.value = '';
+      replyDoubt(q);
+    }
+
+    function askPreset(q) {
+      appendChat('user', q);
+      replyDoubt(q);
+    }
+
+    /* Perfil y Ajustes de alertas */
+    function togglePremium() {
+      state.isPremium = !state.isPremium;
+      if (!state.isPremium && !PROFILES.find(p => p.name === state.profile)?.free) {
+        state.profile = 'Universidad';
+      }
+      renderProfile();
+      renderHome();
+      renderTranscripts();
+      showToast(state.isPremium ? 'Modo Premium (Demo) activado' : 'Volviste a Plan Free');
+    }
+
+    function renderProfile() {
+      document.getElementById('profilePlanBadge').textContent = state.isPremium ? 'Plan Premium' : 'Plan Free';
+      document.getElementById('planCurrentTitle').textContent = state.isPremium ? '✓ Ziva Premium (Demo)' : '✓ Ziva Free';
+      document.getElementById('togglePremiumBtn').textContent = state.isPremium ? 'Volver a Plan Free (Demo)' : 'Mejorar a Premium (Demo)';
+      document.getElementById('planBenefitsList').innerHTML = state.isPremium
+        ? '<li>✓ Historial completo de alertas</li><li>✓ Carpetas y búsqueda en transcripciones</li><li>✓ Perfiles ilimitados por lugar</li><li>✓ Selección personalizada de alertas</li>'
+        : '<li>✓ Alertas críticas ilimitadas (siempre activas)</li><li>✓ Detección de tu nombre</li><li>✓ Transcripción básica en vivo</li><li>✓ 2 perfiles de uso (Casa y Universidad)</li>';
+    }
+
+    function openAlertsConfigModal() {
+      document.getElementById('alertsConfigHint').textContent = state.isPremium
+        ? 'Plan Premium: puedes activar o desactivar alertas según tu entorno.'
+        : 'Plan Free: por seguridad todas las alertas permanecen activas. En Premium puedes seleccionarlas.';
+      const list = document.getElementById('alertsConfigList');
+      list.innerHTML = Object.keys(ALERTS).map(k => {
+        const a = ALERTS[k];
+        const checked = state.isPremium ? state.activeAlerts[k] : true;
+        return `
+          <div class="feed-row" style="justify-content: space-between;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <span style="font-size: 18px;">${a.icon}</span>
+              <div>
+                <div class="feed-title">${a.title}</div>
+                <div class="feed-meta">${a.prio} · ${a.vib}</div>
+              </div>
+            </div>
+            <label class="switch">
+              <input type="checkbox" ${checked ? 'checked' : ''} ${state.isPremium ? '' : 'disabled'} onchange="toggleAlertRule('${k}')">
+              <span class="slider"></span>
+            </label>
+          </div>`;
+      }).join('');
+      openModal('alertsConfigModal');
+    }
+
+    function toggleAlertRule(key) {
+      if (!state.isPremium) return;
+      state.activeAlerts[key] = !state.activeAlerts[key];
+      renderHome();
+    }
+
+    /* Inicialización */
+    renderHome();
+    renderTranscripts();
+    renderProfile();
   </script>
 </body>
 </html>

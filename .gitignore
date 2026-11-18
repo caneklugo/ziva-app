@@ -1,0 +1,26 @@
+# Dependencias
+node_modules/
+
+# Variables de entorno (se versiona solo .env.example)
+.env
+.env.*
+!.env.example
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
+
+# Logs y temporales
+*.log
+*.tmp
+
+# Editores
+.vscode/
+.idea/
+
+# Bocetos de diseño (referencias privadas, solo locales)
+docs/bocetos/
+
+# Herramientas de IA (configuración local)
+.gemini/
+.agent/

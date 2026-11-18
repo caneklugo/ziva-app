@@ -1,21 +1,43 @@
-# Señal · prototipo clickeable — design reference
+# Ziva · Asistente de accesibilidad auditiva
 
-This is a design mockup created in a visual design tool, exported as a
-standalone page. Treat it as a REFERENCE MOCKUP, not production code:
-the markup and inline styles carry the design's precise values — colors,
-font sizes, spacing, radii, shadows, layout — which an implementation
-should replicate faithfully in its own components and styling system
-rather than copy wholesale.
+Prototipo MVP de alta fidelidad para la competencia de Enactus México. Ziva ayuda a personas sordas o con hipoacusia con alertas de seguridad (visuales y hápticas), transcripción con detección del nombre propio y un comunicador visual con botón SOS.
 
-## Contents
+Es un sitio **estático**: no necesita instalar dependencias ni compilar. Todo el comportamiento es simulado.
 
-- `Main.dc.html` — the artboard (a Design Component: an `<x-dc>`
-  template + a small logic class). The values to replicate live in its
-  inline `style="…"` attributes and the `<helmet><style>` block.
-- `support.js`, `vendor/react*.js` — the runtime that renders the
-  component in a browser; not part of the design.
+## Cómo arrancar
 
-## Viewing
+Requiere cualquier servidor HTTP local. Con Python:
 
-Serve the folder (e.g. `python3 -m http.server`) and open `Main.dc.html`;
-some browsers block the scripts over file://.
+```bash
+python -m http.server 8000
+```
+
+Después abre:
+
+- Landing: http://localhost:8000/
+- Prototipo móvil a pantalla completa: http://localhost:8000/app.html
+- Prototipo legado «Señal»: http://localhost:8000/Main.dc.html
+
+Alternativa con Node: `npx serve .`
+
+> Algunos navegadores bloquean scripts con `file://`, por eso se recomienda usar servidor local. La tipografía se carga desde Google Fonts y Fontshare, así que necesitas internet para verla bien.
+
+## Estructura
+
+| Archivo | Descripción |
+|---|---|
+| `index.html` | Landing con el prototipo incrustado en un iframe |
+| `app.html` | Prototipo móvil «Ziva» (HTML, CSS y JS en un solo archivo) |
+| `Main.dc.html` | Prototipo legado «Señal» (no enlazado) |
+| `support.js`, `vendor/` | Runtime y React para `Main.dc.html` (no editar) |
+| `DEPLOY.md` | Guía de despliegue en GitHub Pages |
+| `PROJECT_CONTEXT.md` | Contexto completo del proyecto |
+| `AGENTS.md` | Reglas para agentes de IA (`CLAUDE.md` y `GEMINI.md` apuntan a él) |
+
+## Despliegue
+
+Se publica en GitHub Pages desde la rama `main`, carpeta raíz. Ver [DEPLOY.md](DEPLOY.md).
+
+## Trabajar con IA
+
+Cualquier modelo debe leer primero [AGENTS.md](AGENTS.md) y [PROJECT_CONTEXT.md](PROJECT_CONTEXT.md).
