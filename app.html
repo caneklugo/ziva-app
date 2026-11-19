@@ -620,6 +620,77 @@
       opacity: 0.78;
     }
 
+    .folder-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .note-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .audio-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .play-btn {
+      width: 44px;
+      height: 44px;
+      flex-shrink: 0;
+      border: none;
+      border-radius: 50%;
+      background: var(--blue-jeans);
+      color: #FFFFFF;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    .audio-track {
+      flex: 1;
+      height: 6px;
+      border-radius: 3px;
+      background: var(--sky-blue);
+      overflow: hidden;
+    }
+
+    .audio-fill {
+      height: 100%;
+      background: var(--dark-blue);
+    }
+
+    .audio-time {
+      font-size: 12px;
+      color: var(--text-muted);
+      flex-shrink: 0;
+    }
+
+    .note-text {
+      font-size: 14px;
+      line-height: 1.5;
+      color: var(--dark-blue);
+    }
+
+    .empty-note {
+      background: var(--surface);
+      border: 1px dashed var(--border);
+      border-radius: 16px;
+      padding: 28px 16px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
+
     .premium-pill {
       font-size: 10px;
       font-weight: 600;
@@ -1516,11 +1587,22 @@
       ],
       transcriptTab: 'carpetas',
       folders: [
-        { id: 'clases', name: 'Clases', items: ['Economía · Flujo de caja', 'Contabilidad · Balance general'] },
-        { id: 'reuniones', name: 'Reuniones', items: ['Equipo Enactus · Pitch'] },
-        { id: 'proyectos', name: 'Proyectos', items: ['Diseño prototipo Ziva'] },
-        { id: 'personales', name: 'Personales', items: ['Cita médica'] }
+        { id: 'clases', name: 'Clases', items: [
+          { title: 'Economía · Flujo de caja', date: 'Hoy · 09:30', duration: '12:40', text: 'Hoy vamos a revisar cómo se construye un flujo de caja. Daniela, ¿puedes compartir tu conclusión sobre el ejercicio de la semana pasada?' },
+          { title: 'Contabilidad · Balance general', date: 'Ayer · 11:00', duration: '08:15', text: 'El balance general muestra los activos, los pasivos y el capital en una fecha determinada. Revisemos el ejemplo del pizarrón.' }
+        ] },
+        { id: 'reuniones', name: 'Reuniones', items: [
+          { title: 'Equipo Enactus · Pitch', date: 'Lun · 16:00', duration: '21:05', text: 'Quedamos en ensayar el pitch el jueves. Daniela se encarga de la parte de impacto social y Luis de la de costos.' }
+        ] },
+        { id: 'proyectos', name: 'Proyectos', items: [
+          { title: 'Diseño prototipo Ziva', date: 'Dom · 18:20', duration: '05:50', text: 'Ajustes pendientes del prototipo: contraste en los botones, tamaño de letra y pruebas con personas usuarias.' }
+        ] },
+        { id: 'personales', name: 'Personales', items: [
+          { title: 'Cita médica', date: 'Vie · 10:10', duration: '03:30', text: 'La doctora indicó que debo volver en dos semanas para una revisión. Anotar la fecha en el calendario.' }
+        ] }
       ],
+      openFolder: null,
+      player: { key: null, pct: 0, timer: null },
       recents: [
         { title: 'Clase de Economía (demo)', date: 'Hoy · 09:30', preview: 'Daniela, ¿puedes compartir tu conclusión?' }
       ],
@@ -1711,6 +1793,8 @@
 
     /* Transcripciones */
     function setTranscriptTab(t) {
+      stopPlayer();
+      state.openFolder = null;
       state.transcriptTab = t;
       document.getElementById('segCarpetas').classList.toggle('active', t === 'carpetas');
       document.getElementById('segRecientes').classList.toggle('active', t === 'recientes');
@@ -1729,6 +1813,13 @@
     function renderTranscripts() {
       const body = document.getElementById('transcriptsBody');
       const q = (document.getElementById('transcriptSearchInput').value || '').trim().toLowerCase();
+
+      if (!state.isPremium && state.openFolder) { stopPlayer(); state.openFolder = null; }
+
+      if (state.transcriptTab === 'carpetas' && state.openFolder) {
+        renderFolderDetail(body);
+        return;
+      }
 
       if (state.transcriptTab === 'carpetas') {
         const cards = state.folders
@@ -1768,13 +1859,80 @@
         showToast('Activa la demo Premium en Perfil para abrir carpetas');
         return;
       }
-      const f = state.folders.find(x => x.id === id);
-      if (f) showToast(f.name + ': ' + f.items.join(' · '));
+      if (!state.folders.find(x => x.id === id)) return;
+      stopPlayer();
+      state.openFolder = id;
+      renderTranscripts();
+    }
+
+    function closeFolder() {
+      stopPlayer();
+      state.openFolder = null;
+      renderTranscripts();
+    }
+
+    function renderFolderDetail(body) {
+      const f = state.folders.find(x => x.id === state.openFolder);
+      const header = `
+        <div class="folder-header">
+          <button type="button" class="icon-btn" onclick="closeFolder()" aria-label="Volver a carpetas">‹</button>
+          <div class="feed-info">
+            <div class="feed-title">📁 ${f.name}</div>
+            <div class="feed-meta">${f.items.length} ${f.items.length === 1 ? 'transcripción' : 'transcripciones'}</div>
+          </div>
+        </div>`;
+
+      const rows = f.items.map((it, i) => {
+        const key = f.id + ':' + i;
+        const playing = state.player.key === key;
+        const pct = playing ? state.player.pct : 0;
+        return `
+          <article class="note-card">
+            <div class="feed-title">${it.title}</div>
+            <div class="feed-meta">${it.date} · ${it.duration}</div>
+            <div class="audio-row">
+              <button type="button" class="play-btn" onclick="togglePlay('${key}')" aria-label="${playing ? 'Pausar grabación' : 'Reproducir grabación'}">${playing ? '❚❚' : '▶'}</button>
+              <div class="audio-track" role="progressbar" aria-label="Progreso de la grabación" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.round(pct)}"><div class="audio-fill" id="fill-${i}" style="width: ${pct}%;"></div></div>
+              <span class="audio-time">${it.duration}</span>
+            </div>
+            <p class="note-text">${it.text}</p>
+          </article>`;
+      }).join('');
+
+      const empty = `
+        <div class="empty-note">
+          <div style="font-size: 26px;">🗂️</div>
+          <div class="feed-title">Esta carpeta está vacía</div>
+          <div class="feed-meta">Aquí aparecerán las transcripciones con su grabación.</div>
+        </div>`;
+
+      body.innerHTML = header + (rows || empty);
+    }
+
+    function stopPlayer() {
+      clearInterval(state.player.timer);
+      state.player = { key: null, pct: 0, timer: null };
+    }
+
+    function togglePlay(key) {
+      if (state.player.key === key) {
+        stopPlayer();
+        renderTranscripts();
+        return;
+      }
+      stopPlayer();
+      state.player.key = key;
+      state.player.timer = setInterval(() => {
+        state.player.pct += 4;
+        if (state.player.pct >= 100) { stopPlayer(); }
+        renderTranscripts();
+      }, 400);
+      renderTranscripts();
     }
 
     function createFolder() {
       const idx = state.folders.length + 1;
-      state.folders.push({ id: 'extra-' + idx, name: 'Carpeta ' + idx, items: ['Nueva nota'] });
+      state.folders.push({ id: 'extra-' + idx, name: 'Carpeta ' + idx, items: [] });
       renderTranscripts();
       showToast('Carpeta creada');
     }
