@@ -477,6 +477,69 @@
       color: var(--text-muted);
     }
 
+    .recent-row {
+      align-items: flex-start;
+    }
+
+    .recent-line1 {
+      display: flex;
+      align-items: baseline;
+      gap: 6px;
+      min-width: 0;
+    }
+
+    .recent-name {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--dark-blue);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      min-width: 0;
+    }
+
+    .recent-dot,
+    .recent-when {
+      font-size: 12px;
+      color: var(--text-muted);
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .recent-folder {
+      font-size: 11px;
+      color: var(--text-muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* Una sola línea de contenido que se desvanece al final */
+    .recent-preview {
+      font-size: 12px;
+      color: var(--dark-blue);
+      white-space: nowrap;
+      overflow: hidden;
+      -webkit-mask-image: linear-gradient(to right, #000 78%, transparent 100%);
+      mask-image: linear-gradient(to right, #000 78%, transparent 100%);
+    }
+
+    .name-input {
+      width: 100%;
+      min-height: 44px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 0 12px;
+      font-size: 15px;
+      color: var(--dark-blue);
+      background: var(--bg);
+      outline: none;
+    }
+
+    .name-input:focus {
+      border-color: var(--primary);
+    }
+
     .limit-banner {
       font-size: 12px;
       color: var(--text-muted);
@@ -1520,6 +1583,18 @@
       </div>
     </div>
 
+    <!-- ================= SHEET: ELEGIR CARPETA AL GUARDAR (Premium) ================= -->
+    <div class="modal-overlay sheet-modal" id="folderPickerModal" role="dialog" aria-modal="true" aria-labelledby="folderPickerTitle">
+      <div class="screen-header">
+        <h2 class="screen-title" id="folderPickerTitle" style="font-size: 22px;">¿Guardar en una carpeta?</h2>
+        <button type="button" class="icon-btn" onclick="closeModal('folderPickerModal')" aria-label="Cancelar">✕</button>
+      </div>
+      <p style="font-size: 13px; color: var(--text-muted);">Puedes cambiar el nombre de la transcripción. Elige una carpeta para clasificarla o guárdala sin carpeta. Siempre aparecerá en Recientes.</p>
+      <label class="field-label" for="transcriptNameInput" style="font-size: 12px; font-weight: 600; color: var(--blue-jeans);">Nombre de la transcripción</label>
+      <input type="text" id="transcriptNameInput" class="name-input" maxlength="60" autocomplete="off">
+      <div class="folder-list" id="folderPickerList"></div>
+    </div>
+
     <!-- ================= SHEET: PERFILES DE USO ================= -->
     <div class="modal-overlay sheet-modal" id="profileModal" role="dialog" aria-modal="true">
       <div class="screen-header">
@@ -1573,6 +1648,30 @@
       'sasmex': 'SASMEX es el Sistema de Alerta Sísmica Mexicano que emite el sonido oficial segundos antes de un sismo fuerte.'
     };
 
+    /* Fechas de transcripciones */
+    function daysAgoAt(days, h, m) {
+      const d = new Date();
+      d.setDate(d.getDate() - days);
+      d.setHours(h, m, 0, 0);
+      return d.getTime();
+    }
+
+    /* Mismo día: hora · dentro de la semana: día · después: fecha */
+    function formatWhen(ts) {
+      const d = new Date(ts);
+      const now = new Date();
+      const startOf = x => new Date(x.getFullYear(), x.getMonth(), x.getDate()).getTime();
+      const diffDays = Math.round((startOf(now) - startOf(d)) / 86400000);
+      if (diffDays <= 0) {
+        return String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
+      }
+      if (diffDays < 7) {
+        const dia = d.toLocaleDateString('es-MX', { weekday: 'long' });
+        return dia.charAt(0).toUpperCase() + dia.slice(1);
+      }
+      return String(d.getDate()).padStart(2, '0') + '/' + String(d.getMonth() + 1).padStart(2, '0') + '/' + d.getFullYear();
+    }
+
     const state = {
       tab: 'inicio',
       isListening: true,
@@ -1587,24 +1686,21 @@
       ],
       transcriptTab: 'carpetas',
       folders: [
-        { id: 'clases', name: 'Clases', items: [
-          { title: 'Economía · Flujo de caja', date: 'Hoy · 09:30', duration: '12:40', text: 'Hoy vamos a revisar cómo se construye un flujo de caja. Daniela, ¿puedes compartir tu conclusión sobre el ejercicio de la semana pasada?' },
-          { title: 'Contabilidad · Balance general', date: 'Ayer · 11:00', duration: '08:15', text: 'El balance general muestra los activos, los pasivos y el capital en una fecha determinada. Revisemos el ejemplo del pizarrón.' }
-        ] },
-        { id: 'reuniones', name: 'Reuniones', items: [
-          { title: 'Equipo Enactus · Pitch', date: 'Lun · 16:00', duration: '21:05', text: 'Quedamos en ensayar el pitch el jueves. Daniela se encarga de la parte de impacto social y Luis de la de costos.' }
-        ] },
-        { id: 'proyectos', name: 'Proyectos', items: [
-          { title: 'Diseño prototipo Ziva', date: 'Dom · 18:20', duration: '05:50', text: 'Ajustes pendientes del prototipo: contraste en los botones, tamaño de letra y pruebas con personas usuarias.' }
-        ] },
-        { id: 'personales', name: 'Personales', items: [
-          { title: 'Cita médica', date: 'Vie · 10:10', duration: '03:30', text: 'La doctora indicó que debo volver en dos semanas para una revisión. Anotar la fecha en el calendario.' }
-        ] }
+        { id: 'clases', name: 'Clases' },
+        { id: 'reuniones', name: 'Reuniones' },
+        { id: 'proyectos', name: 'Proyectos' },
+        { id: 'personales', name: 'Personales' }
       ],
       openFolder: null,
       player: { key: null, pct: 0, timer: null },
-      recents: [
-        { title: 'Clase de Economía (demo)', date: 'Hoy · 09:30', preview: 'Daniela, ¿puedes compartir tu conclusión?' }
+      /* Lista única de transcripciones: folderId null = «Sin carpeta». Recientes las muestra todas; cada carpeta, las suyas. */
+      transcripts: [
+        { id: 't1', folderId: 'clases', title: 'Economía · Flujo de caja', createdAt: daysAgoAt(0, 9, 30), duration: '12:40', text: 'Hoy vamos a revisar cómo se construye un flujo de caja. Daniela, ¿puedes compartir tu conclusión sobre el ejercicio de la semana pasada?' },
+        { id: 't2', folderId: null, title: 'Clase de Economía (demo)', createdAt: daysAgoAt(0, 8, 15), duration: '04:20', text: 'Daniela, ¿puedes compartir tu conclusión? Recuerden que para el viernes deben entregar el resumen en la plataforma.' },
+        { id: 't3', folderId: 'clases', title: 'Contabilidad · Balance general', createdAt: daysAgoAt(1, 11, 0), duration: '08:15', text: 'El balance general muestra los activos, los pasivos y el capital en una fecha determinada. Revisemos el ejemplo del pizarrón.' },
+        { id: 't4', folderId: 'reuniones', title: 'Equipo Enactus · Pitch', createdAt: daysAgoAt(3, 16, 0), duration: '21:05', text: 'Quedamos en ensayar el pitch el jueves. Daniela se encarga de la parte de impacto social y Luis de la de costos.' },
+        { id: 't5', folderId: 'proyectos', title: 'Diseño prototipo Ziva', createdAt: daysAgoAt(5, 18, 20), duration: '05:50', text: 'Ajustes pendientes del prototipo: contraste en los botones, tamaño de letra y pruebas con personas usuarias.' },
+        { id: 't6', folderId: 'personales', title: 'Cita médica', createdAt: daysAgoAt(12, 10, 10), duration: '03:30', text: 'La doctora indicó que debo volver en dos semanas para una revisión. Anotar la fecha en el calendario.' }
       ],
       live: { running: false, shown: 0, fontSize: 16, mode: 'clase', timer: null },
       audioCtx: null
@@ -1829,7 +1925,7 @@
               <span style="font-size: 20px;">📁</span>
               <div class="feed-info">
                 <div class="feed-title">${f.name}</div>
-                <div class="feed-meta">${f.items.length} transcripciones</div>
+                <div class="feed-meta">${itemsOf(f.id).length} ${itemsOf(f.id).length === 1 ? 'transcripción' : 'transcripciones'}</div>
               </div>
               ${state.isPremium ? '<span style="color: var(--text-muted);">›</span>' : '<span class="premium-pill">Premium</span>'}
             </button>`).join('');
@@ -1840,16 +1936,22 @@
 
         body.innerHTML = cards + newBtn;
       } else {
-        const items = state.recents
-          .filter(r => !q || r.title.toLowerCase().includes(q) || r.preview.toLowerCase().includes(q))
-          .map(r => `
-            <div class="feed-row">
+        const items = state.transcripts
+          .slice()
+          .sort((a, b) => b.createdAt - a.createdAt)
+          .filter(r => !q || r.title.toLowerCase().includes(q) || r.text.toLowerCase().includes(q))
+          .map(r => {
+            const fol = r.folderId ? state.folders.find(x => x.id === r.folderId) : null;
+            return `
+            <div class="feed-row recent-row">
               <div class="feed-badge">📝</div>
               <div class="feed-info">
-                <div class="feed-title">${r.title}</div>
-                <div class="feed-meta">${r.date} · ${r.preview}</div>
+                <div class="recent-line1"><span class="recent-name">${r.title}</span><span class="recent-dot" aria-hidden="true">·</span><span class="recent-when">${formatWhen(r.createdAt)}</span></div>
+                <div class="recent-folder">${fol ? fol.name : 'Sin carpeta'}</div>
+                <div class="recent-preview">${r.text}</div>
               </div>
-            </div>`).join('');
+            </div>`;
+          }).join('');
         body.innerHTML = items || '<div class="feed-row"><div class="feed-info"><div class="feed-title">Sin coincidencias</div></div></div>';
       }
     }
@@ -1873,23 +1975,24 @@
 
     function renderFolderDetail(body) {
       const f = state.folders.find(x => x.id === state.openFolder);
+      const list = itemsOf(f.id);
       const header = `
         <div class="folder-header">
           <button type="button" class="icon-btn" onclick="closeFolder()" aria-label="Volver a carpetas">‹</button>
           <div class="feed-info">
             <div class="feed-title">📁 ${f.name}</div>
-            <div class="feed-meta">${f.items.length} ${f.items.length === 1 ? 'transcripción' : 'transcripciones'}</div>
+            <div class="feed-meta">${list.length} ${list.length === 1 ? 'transcripción' : 'transcripciones'}</div>
           </div>
         </div>`;
 
-      const rows = f.items.map((it, i) => {
-        const key = f.id + ':' + i;
+      const rows = list.map((it, i) => {
+        const key = it.id;
         const playing = state.player.key === key;
         const pct = playing ? state.player.pct : 0;
         return `
           <article class="note-card">
             <div class="feed-title">${it.title}</div>
-            <div class="feed-meta">${it.date} · ${it.duration}</div>
+            <div class="feed-meta">${formatWhen(it.createdAt)} · ${it.duration}</div>
             <div class="audio-row">
               <button type="button" class="play-btn" onclick="togglePlay('${key}')" aria-label="${playing ? 'Pausar grabación' : 'Reproducir grabación'}">${playing ? '❚❚' : '▶'}</button>
               <div class="audio-track" role="progressbar" aria-label="Progreso de la grabación" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.round(pct)}"><div class="audio-fill" id="fill-${i}" style="width: ${pct}%;"></div></div>
@@ -1907,6 +2010,12 @@
         </div>`;
 
       body.innerHTML = header + (rows || empty);
+    }
+
+    function itemsOf(folderId) {
+      return state.transcripts
+        .filter(t => t.folderId === folderId)
+        .sort((a, b) => b.createdAt - a.createdAt);
     }
 
     function stopPlayer() {
@@ -1932,7 +2041,7 @@
 
     function createFolder() {
       const idx = state.folders.length + 1;
-      state.folders.push({ id: 'extra-' + idx, name: 'Carpeta ' + idx, items: [] });
+      state.folders.push({ id: 'extra-' + idx, name: 'Carpeta ' + idx });
       renderTranscripts();
       showToast('Carpeta creada');
     }
@@ -1997,14 +2106,58 @@
     }
 
     function saveLiveTranscript() {
-      state.recents.unshift({
-        title: state.live.mode === 'clase' ? 'Clase grabada' : 'Conversación 1 a 1',
-        date: 'Ahora',
-        preview: 'Daniela, ¿puedes compartir tu conclusión?'
+      /* Free: se guarda directo en Recientes. Premium: primero se pregunta la carpeta. */
+      if (!state.isPremium) { finishSaveTranscript(null); return; }
+      renderFolderPicker();
+      openModal('folderPickerModal');
+    }
+
+    function defaultTranscriptTitle() {
+      return state.live.mode === 'clase' ? 'Clase grabada' : 'Conversación 1 a 1';
+    }
+
+    function renderFolderPicker() {
+      document.getElementById('transcriptNameInput').value = defaultTranscriptTitle();
+      const list = document.getElementById('folderPickerList');
+      list.innerHTML = state.folders.map(f => `
+        <button type="button" class="folder-card" onclick="finishSaveTranscript('${f.id}')">
+          <span style="font-size: 20px;">📁</span>
+          <div class="feed-info">
+            <div class="feed-title">${f.name}</div>
+            <div class="feed-meta">${itemsOf(f.id).length} ${itemsOf(f.id).length === 1 ? 'transcripción' : 'transcripciones'}</div>
+          </div>
+          <span style="color: var(--text-muted);">›</span>
+        </button>`).join('') + `
+        <button type="button" class="btn-outline" onclick="finishSaveTranscript(null)">Guardar sin carpeta</button>`;
+    }
+
+    function finishSaveTranscript(folderId) {
+      /* Solo Premium puede renombrar; en Free se usa el nombre por defecto */
+      const input = document.getElementById('transcriptNameInput');
+      const typed = state.isPremium && input ? input.value.trim() : '';
+      const title = typed || defaultTranscriptTitle();
+      const text = DEMO_LINES.slice(0, Math.max(1, state.live.shown)).map(l => l.text).join(' ');
+      const folder = state.isPremium && folderId ? state.folders.find(x => x.id === folderId) : null;
+
+      state.transcripts.push({
+        id: 't' + Date.now(),
+        folderId: folder ? folder.id : null,
+        title,
+        createdAt: Date.now(),
+        duration: '00:30',
+        text
       });
+
+      closeModal('folderPickerModal');
       closeLiveTranscript();
-      setTranscriptTab('recientes');
-      showToast('Transcripción guardada en Recientes');
+      if (folder) {
+        setTranscriptTab('carpetas');
+        openFolder(folder.id);
+        showToast('Transcripción guardada en «' + folder.name + '»');
+      } else {
+        setTranscriptTab('recientes');
+        showToast('Transcripción guardada en Recientes');
+      }
     }
 
     function closeLiveTranscript() {
