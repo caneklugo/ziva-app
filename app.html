@@ -32,6 +32,7 @@
       --alert-border: #F2C6CC;
       --success: #047857;
       --success-bg: #ECFDF5;
+      --success-border: #A7F3D0;
       --font-title: 'Playfair Display', Georgia, serif;
       --font: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
     }
@@ -1259,23 +1260,66 @@
 
     .toast {
       position: absolute;
-      bottom: 80px;
-      left: 18px;
-      right: 18px;
-      background: var(--dark-blue);
-      color: #FFFFFF;
-      padding: 10px 14px;
+      bottom: 76px;
+      left: 16px;
+      right: 16px;
+      background: var(--surface-subtle);
+      border: 1px solid var(--sky-blue);
+      border-left: 5px solid var(--blue-jeans);
       border-radius: 14px;
-      font-size: 12px;
-      font-weight: 500;
-      text-align: center;
-      z-index: 60;
+      padding: 11px 14px;
       display: none;
-      box-shadow: 0 10px 24px rgba(13, 36, 59, 0.25);
+      align-items: center;
+      gap: 10px;
+      text-align: left;
+      z-index: 60;
+      box-shadow: 0 12px 28px rgba(13, 36, 59, 0.18);
     }
 
     .toast.show {
-      display: block;
+      display: flex;
+    }
+
+    .toast.type-success {
+      background: var(--success-bg);
+      border-color: var(--success-border);
+      border-left-color: var(--success);
+    }
+
+    .toast.type-info {
+      background: var(--surface-subtle);
+      border-color: var(--sky-blue);
+      border-left-color: var(--blue-jeans);
+    }
+
+    .toast.type-error {
+      background: var(--alert-tint);
+      border-color: var(--alert-border);
+      border-left-color: var(--black-cherry);
+    }
+
+    .toast-icon {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--surface);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .toast.type-success .toast-icon { color: var(--success); }
+    .toast.type-info .toast-icon { color: var(--blue-jeans); }
+    .toast.type-error .toast-icon { color: var(--black-cherry); }
+
+    .toast-text {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--dark-blue);
+      line-height: 1.35;
     }
   </style>
 </head>
@@ -1514,7 +1558,10 @@
     </nav>
 
     <!-- Toast de avisos -->
-    <div class="toast" id="toastMsg" role="status" aria-live="polite"></div>
+    <div class="toast type-info" id="toastMsg" role="status" aria-live="polite">
+      <span class="toast-icon" id="toastIcon" aria-hidden="true">i</span>
+      <span class="toast-text" id="toastText"></span>
+    </div>
 
     <!-- ================= MODAL ALERTA FULLSCREEN (sin botón de mapa) ================= -->
     <div class="modal-overlay alert-modal" id="alertModal" role="dialog" aria-modal="true" aria-labelledby="alertModalTitle">
@@ -1722,10 +1769,12 @@
       });
     }, 200);
 
-    function showToast(msg) {
+    function showToast(msg, type = 'info') {
+      const icons = { success: '✓', info: 'i', error: '!' };
       const el = document.getElementById('toastMsg');
-      el.textContent = msg;
-      el.classList.add('show');
+      el.className = 'toast show type-' + (icons[type] ? type : 'info');
+      document.getElementById('toastIcon').textContent = icons[type] || 'i';
+      document.getElementById('toastText').textContent = msg;
       clearTimeout(el._t);
       el._t = setTimeout(() => el.classList.remove('show'), 2600);
     }
@@ -2043,7 +2092,7 @@
       const idx = state.folders.length + 1;
       state.folders.push({ id: 'extra-' + idx, name: 'Carpeta ' + idx });
       renderTranscripts();
-      showToast('Carpeta creada');
+      showToast('Carpeta creada', 'success');
     }
 
     /* Transcripción en vivo (disponible en Free) */
@@ -2153,10 +2202,10 @@
       if (folder) {
         setTranscriptTab('carpetas');
         openFolder(folder.id);
-        showToast('Transcripción guardada en «' + folder.name + '»');
+        showToast('Transcripción guardada en «' + folder.name + '»', 'success');
       } else {
         setTranscriptTab('recientes');
-        showToast('Transcripción guardada en Recientes');
+        showToast('Transcripción guardada en Recientes', 'success');
       }
     }
 
@@ -2183,14 +2232,14 @@
 
     function speakMessage() {
       const txt = document.getElementById('hablarInput').value.trim();
-      if (!txt) { showToast('Escribe un mensaje primero'); return; }
+      if (!txt) { showToast('Escribe un mensaje primero', 'error'); return; }
       if ('speechSynthesis' in window) {
         const u = new SpeechSynthesisUtterance(txt);
         u.lang = 'es-MX';
         window.speechSynthesis.cancel();
         window.speechSynthesis.speak(u);
       } else {
-        showToast('Síntesis de voz no disponible en este navegador');
+        showToast('Síntesis de voz no disponible en este navegador', 'error');
       }
     }
 
@@ -2245,7 +2294,7 @@
       renderProfile();
       renderHome();
       renderTranscripts();
-      showToast(state.isPremium ? 'Modo Premium (Demo) activado' : 'Volviste a Plan Free');
+      showToast(state.isPremium ? 'Modo Premium (Demo) activado' : 'Volviste a Plan Free', state.isPremium ? 'success' : 'info');
     }
 
     function renderProfile() {
