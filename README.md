@@ -28,6 +28,7 @@ Alternativa con Node: `npx serve .`
 |---|---|
 | `index.html` | Landing con el prototipo incrustado en un iframe |
 | `app.html` | Prototipo móvil «Ziva» (HTML, CSS y JS en un solo archivo) |
+| `assets/tracking-record/` | Fotos del recorrido Enactus, miniaturas `16:9` (`thumbs/`) y logo de Enactus Tecmilenio Chihuahua |
 | `Main.dc.html` | Prototipo legado «Señal» (no enlazado) |
 | `support.js`, `vendor/` | Runtime y React para `Main.dc.html` (no editar) |
 | `DEPLOY.md` | Guía de despliegue en GitHub Pages |

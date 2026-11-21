@@ -1,10 +1,9 @@
 # Contexto del proyecto: Ziva (prototipo-enactus)
 
 > Documento de contexto para cualquier IA o persona. Léelo en lugar de reanalizar todos los archivos.
-> **Análisis realizado:** 2026-11-17 · **Último commit de código antes de la pausa:** `a50728f` · **Rama:** `main`
-> El commit de pausa (`docs: pausa del plan principal, cambios en curso`) es posterior a `a50728f` e incluye las Fases 1 y 2. Para ver su hash usa `git log -2 --oneline`.
-> **Estado: PAUSADO** (2026-11-18). Antes de seguir, lee la sección 8 «Pendientes» y la última fila de la sección 11.
-> Si `git log -1` muestra un commit posterior al de pausa, revisa `git diff <commit-de-pausa>..HEAD` y actualiza este documento.
+> **Última actualización:** 2026-11-20 · **Último commit confirmado al cerrar:** `006950c` (quedan pendientes de commit los cambios del punto 8 en `index.html`, más esta actualización documental) · **Rama:** `main`
+> El plan principal (Fase 3) quedó en pausa en `8936c18`. Entre `47d9e91` y `006950c` (y el punto 8) se trabajaron 8 ajustes puntuales de frontend.
+> Antes de retomar el plan principal, lee la sección 8 «Pendientes» y la última fila de la sección 11.
 
 ## 1. Propósito
 Ziva es un asistente móvil de accesibilidad auditiva para personas sordas o con hipoacusia. Este repositorio es un **prototipo MVP clickeable** (no hay IA, micrófono ni backend reales) para presentar en la **Competencia Nacional de Emprendimiento Social de Enactus México**.
@@ -33,8 +32,9 @@ Modelo de negocio (en la landing): Gratis (\$0 MXN, alertas críticas siempre gr
 ## 4. Estructura de archivos
 | Archivo | Líneas aprox. | Descripción |
 |---|---|---|
-| `index.html` | ~1190 | Landing: navbar (sin etiqueta Enactus por ahora), hero con iframe de `app.html` en marco de teléfono (`#demo`), problema y estadísticas (`#problema`), 3 pilares (`#funciones`), catálogo de sonidos (`#alertas`), precios (`#modelo`), impacto ODS (`#impacto`), footer. Variables CSS en `:root` (tema claro, paleta azul `#325978` / `#0D243B` / `#A7CADF`, alertas en `#730F1A`). |
-| `app.html` | ~890 | Prototipo móvil Ziva (Fase 2 completada): 5 pestañas (`Inicio`, `Transcripciones`, `Hablar`, `Aprende`, `Perfil`), tema claro azul, Poppins + Playfair Display, 7 alertas, chat IA simulado y modo Free/Premium interactivo. |
+| `index.html` | 1563 | Landing: navbar compacta (58 px), hero centrado de 2 columnas (iframe de `app.html` a la izquierda y título/botón a la derecha, sin badge superior), problema y estadísticas (`#problema`), 3 pilares (`#funciones`), catálogo de sonidos (`#alertas`), precios (`#modelo`, con botón de Campus & Empresa enlazado al Instagram `@enactustecmicuu`), bloque Compromiso Enactus (ODS 10, 9 y 4 + logo circular de Enactus Tecmilenio Chihuahua con enlace a Instagram) + Tracking Record en línea de tiempo escalonada de 5 hitos con lightbox (`#impacto`), footer. Variables CSS en `:root` (tema claro, paleta azul `#325978` / `#0D243B` / `#A7CADF`, alertas en `#730F1A`). |
+| `app.html` | 2347 | Prototipo móvil Ziva: barra inferior de **4** pestañas (`Inicio`, `Transcripciones`, `Hablar`, `Aprende`; `Perfil` se abre desde el icono superior derecho en `Inicio` o desde «Ver Premium»), escucha pausable tocando el círculo radar (cambia a icono de micrófono cruzado), carpetas navegables con reproductor simulado en Premium, modal para renombrar y elegir carpeta al guardar transcripción (Premium), fichas de Recientes con fecha dinámica y degradado, y avisos tipo notificación con colores por sentido (`success`, `info`, `error`). |
+| `assets/tracking-record/` | — | 5 fotos originales del recorrido (`1-...` a `5-pej.jpeg`), `hub-chih-logo.png` y subcarpeta `thumbs/` con las 5 miniaturas recortadas en `16:9`. (`descripciones.md` local está ignorado en `.gitignore`). |
 | `Main.dc.html` | 834 | **Prototipo legado «Señal».** Design Component (`<x-dc>`) con clase `Component extends DCLogic`. Azul, Atkinson Hyperlegible. No enlazado. |
 | `support.js` | — | Runtime generado de dc (minificado). No editar. |
 | `vendor/react.js`, `vendor/react-dom.js` | — | React de producción minificado. |
@@ -43,17 +43,17 @@ Modelo de negocio (en la landing): Gratis (\$0 MXN, alertas críticas siempre gr
 Puntos de entrada: `index.html` (landing) → `app.html` (prototipo). `Main.dc.html` es independiente.
 
 ## 5. `app.html` (prototipo vigente)
-**Pestañas** (`switchTab`): Inicio (`#tab-inicio`), Transcripciones (`#tab-transcripciones`), Hablar (`#tab-hablar`), Aprende (`#tab-aprende`), Perfil (`#tab-perfil`). Activa marcada en Black cherry (`#730F1A`).
+**Pestañas** (`switchTab`): barra inferior de 4 pestañas — Inicio (`#tab-inicio`), Transcripciones (`#tab-transcripciones`), Hablar (`#tab-hablar`), Aprende (`#tab-aprende`). Perfil (`#tab-perfil`) se abre desde el botón superior en Inicio o desde los avisos de Premium. Activa marcada en Black cherry (`#730F1A`).
 
-**Estado global** (`state`): `tab`, `isListening`, `isPremium`, `profile`, `activeAlerts`, `history`, `transcriptTab`, `folders`, `recents`, `live`, `audioCtx`.
+**Estado global** (`state`): `tab`, `isListening`, `isPremium`, `profile`, `activeAlerts`, `history`, `transcriptTab`, `folders`, `openFolder`, `player`, `transcripts`, `live`, `audioCtx`.
 
 **`ALERTS` (7 sonidos de sección 10):** `nombre`, `timbre`, `sirena` (Ambulancia/Policía), `grito`, `claxon`, `llanto` (Llanto de bebé), `alarma` (Sismo/Incendio). Cada una define título, subtítulo, dirección, ícono, prioridad, patrón de vibración y tono.
 
 **Lógica Free vs Premium (`togglePremium`):**
-- **Free:** 2 perfiles (`Universidad` y `Casa`), máximo 3 alertas en el feed de Inicio, todas las alertas protegidas/activas por seguridad, carpetas bloqueadas (pero con botón `+ Nueva transcripción en vivo` funcional).
-- **Premium (Demo):** perfiles ilimitados (`Universidad`, `Casa`, `Trabajo`, `Calle`), historial completo de alertas, carpetas navegables + creación/búsqueda, y switches de `activeAlerts` funcionales en Ajustes.
+- **Free:** 2 perfiles (`Universidad` y `Casa`), máximo 3 alertas en el feed de Inicio, todas las alertas protegidas/activas por seguridad, carpetas bloqueadas (pero con botón `+ Nueva transcripción en vivo` funcional que guarda directo en Recientes).
+- **Premium (Demo):** perfiles ilimitados (`Universidad`, `Casa`, `Trabajo`, `Calle`), historial completo de alertas, carpetas navegables con vista de transcripciones y reproductor simulado, renombrado y asignación de carpeta al guardar nota en vivo, búsqueda en transcripciones y switches de `activeAlerts` funcionales en Ajustes.
 
-**Otras vistas:** modal de alerta fullscreen en degradado Dark blue (solo botón `Entendido`), `Hablar` (caja de texto + pizarrón ≥ 48 px + `speechSynthesis` + 6 frases rápidas + `S.O.S.`), y `Aprende` («Dudas y Definiciones» con diccionario local de modismos/términos). Todo simulado en cliente, sin persistencia ni red.
+**Otras vistas y avisos:** modal de alerta fullscreen en degradado Dark blue (solo botón `Entendido`), `Hablar` (caja de texto + pizarrón ≥ 48 px + `speechSynthesis` + 6 frases rápidas + `S.O.S.`), `Aprende` («Dudas y Definiciones» con diccionario local de modismos/términos) y `showToast(msg, type)` con tarjetas inferiores de fondo tenue y barra izquierda según el tipo (`success` verde, `info` azul, `error` vino). Todo simulado en cliente, sin persistencia ni red.
 
 ## 6. `Main.dc.html` («Señal», legado)
 Primer prototipo exportado de una herramienta de diseño. Marca provisional «Señal», paleta azul y fuente Atkinson Hyperlegible.
@@ -87,13 +87,13 @@ Primer prototipo exportado de una herramienta de diseño. Marca provisional «Se
 | Pendiente | **Hospedaje:** GitHub Pages con repo privado exige plan de pago; el usuario investigará alternativas (Cloudflare Pages, Netlify, Vercel, Firebase Hosting) en la app de Gemini y traerá los resultados. Hasta entonces `DEPLOY.md` queda tal cual (con pasos obsoletos). Nota: GitHub Pages «desde rama» solo sirve la raíz o `/docs`, no `web/`. |
 | Pendiente | **Organización de carpetas y archivos:** ordenar la estructura del repositorio (separar/agrupar archivos web, legados y documentación manteniendo rutas relativas válidas para GitHub Pages) antes o al iniciar la Fase 3. |
 | Pendiente | **Fase 3:** definir arquitectura y base de la app móvil Android (evaluar Kotlin + Jetpack Compose), considerando la nueva estructura organizada del proyecto. |
-| Pendiente | **Revisión visual manual** en navegador (`python -m http.server 8000`) de `index.html` y `app.html` tras las Fases 1 y 2. Puntos clave: el prototipo dentro del iframe (la barra de 5 pestañas y los modales deben caber en 780 px escritorio / 600 px móvil), `app.html` en un celular real (vibración, zoom, botones ≥ 44 px, voz) y los flujos Free/Premium. **Nunca se ha visto a detalle el prototipo dentro de la landing.** |
+| Resuelto | **Revisión visual en navegador** de `index.html` y `app.html` (hecha en vivo con `live-server` durante los ajustes de frontend del 18 al 20 de nov). Queda pendiente únicamente probar en un celular físico real (vibración háptica y `speechSynthesis`). |
+| Resuelto | Se agregó en `index.html` (`#impacto`) el bloque de Compromiso Enactus (ODS 10, 9 y 4 + logo de Enactus Tecmilenio Chihuahua enlazado a Instagram) y el **Tracking Record** en línea de tiempo de 5 hitos con fotos, miniaturas `16:9` y lightbox. |
+| Pendiente | En `app.html`, añadir carpeta fija/vista para transcripciones sin carpeta o botón «Mover a…» (propuesta pendiente de implementar, ya que hoy solo se muestran en `Recientes`). |
 | Pendiente | Reemplazar el SVG aproximado del logo por el archivo original con fondo transparente cuando el usuario lo suba. |
-| Pendiente | Agregar en `index.html` una sección futura del camino de desarrollo del proyecto y logros (incluyendo Enactus). |
 | Pendiente | Alinear textos de `index.html` con la sección 10 (landing dice «9 situaciones críticas» y lista 8 sonidos; faltan llanto de bebé y timbre, sobran disparos/explosiones). |
 | Pendiente | La landing menciona tarjeta de identidad; evaluar si se incluye en la app o se ajusta el texto de `index.html`. |
 | Pendiente | Las estadísticas de la landing (+2.3M, 82 %, 100 %) no tienen fuente en el repo. |
-| Pendiente | El enlace «GitHub» del footer apunta a `https://github.com` genérico. |
 | Pendiente | `DEPLOY.md` incluye pasos que ya no aplican (el remoto ya existe). |
 | Pendiente | Revisar la codificación de `README.md` y `DEPLOY.md` si se ven caracteres raros en la terminal. |
 
@@ -156,9 +156,8 @@ Black cherry #730F1A
 | 2026-11-17 | Fase 2 ejecutada: rediseño completo de `app.html` con 5 pestañas (`Inicio`, `Transcripciones`, `Hablar`, `Aprende`, `Perfil`), 7 alertas de sección 10, modal de alerta en degradado Dark blue sin botón de mapa, lógica real de Free vs Premium y mejoras de accesibilidad (sin `user-scalable=no`, objetivos ≥ 44 px). Actualizado `PROJECT_CONTEXT.md`. Sin commit. |
 | 2026-11-18 | **Pausa.** Se revisó `git status`, se redactó el plan de organización del repositorio y de la Fase 3 (Android) y se entregó al usuario un prompt para investigar hospedaje con repo privado. No se modificó código en esta sesión. Se hizo el commit de pausa `docs: pausa del plan principal, cambios en curso` con todo lo de las Fases 1 y 2 (`README.md`, `app.html`, `index.html`, `.gitignore`, `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, `PROJECT_CONTEXT.md`). |
 
-**Qué quedó incompleto al pausar:**
-- **Ningún archivo de código quedó a medias.** `index.html` y `app.html` están en estado funcional (sintaxis JS validada con `node --check`), pero **no se han revisado visualmente en navegador**.
-- **El plan de la Fase 3 no está aprobado.** Está escrito pero espera que el usuario lo lea, responda las 7 preguntas abiertas (ver sección 8) y lo apruebe. No se ha movido ni creado ninguna carpeta (`web/`, `legacy/`, `android/`).
-- **No se ha elegido hospedaje.** El repositorio sigue público y el sitio asume GitHub Pages.
-- `DEPLOY.md`, `README.md` (comando de arranque) y `AGENTS.md` siguen asumiendo que `index.html` está en la raíz; cambiarán cuando se reorganice.
-- El logo en `index.html` y `app.html` es una aproximación SVG; falta el original con fondo transparente.
+| 2026-11-18 a 2026-11-20 | **Ajustes puntuales de frontend (8 puntos):** (1) se quitó Perfil de la barra inferior de `app.html` (`47d9e91`); (2) el círculo radar de Inicio pausa/reanuda la escucha con icono de micrófono cruzado (`38b36c5`); (3) carpetas navegables con reproductor simulado en Premium (`239d4d5`); (4) renombrar y asignar carpeta al guardar nota en vivo en Premium + nuevo diseño de 3 renglones con fecha dinámica y degradado en Recientes (`940ae6d`); (5) avisos `showToast` tipo tarjeta con fondo tenue y colores por sentido (`5ced143`); (6) botón Campus & Empresa en `index.html` enlazado a Instagram `@enactustecmicuu` (`f12e033`); (7) sección Compromiso Enactus + Tracking Record de 5 hitos con `assets/tracking-record/` (`thumbs/` `16:9` + lightbox), logo circular y `.gitignore` actualizado (`006950c`); (8) reacomodo del hero de `index.html` (sin badge superior, navbar de 58 px, 2 columnas centradas con prototipo completo a la izquierda y texto a la derecha, sin texto bajo el teléfono). Etiquetas `base-inicio-ajustes-frontend` y `base-punto-01` a `base-punto-08` creadas. |
+
+**Estado al cerrar (2026-11-20):**
+- **Siguen pendientes del plan principal (sin cambios respecto al 2026-11-18):** aprobación de `plan_fase3.md` y sus 7 preguntas abiertas, decisión de hospedaje y reorganización de carpetas (`web/`, `legacy/`, `docs/`, `android/`). Si se reorganiza `index.html` a `web/`, recordar mover también `assets/` manteniendo las rutas relativas `assets/tracking-record/...`.
+- **Nota sobre Git:** el punto 8 (`index.html`) y esta actualización de `PROJECT_CONTEXT.md` / `README.md` se confirman al cierre de esta sesión y luego se hace `git push origin main` para actualizar GitHub Pages.
