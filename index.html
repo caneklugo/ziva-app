@@ -665,61 +665,301 @@
     }
 
     .impact-box {
-      background: linear-gradient(135deg, var(--dark-blue) 0%, var(--blue-jeans) 100%);
+      background: linear-gradient(135deg, var(--dark-blue) 0%, #153554 100%);
       border: 1px solid rgba(167, 202, 223, 0.25);
-      border-radius: 28px;
-      padding: clamp(28px, 5vw, 48px) clamp(20px, 4vw, 36px);
+      border-radius: 24px;
+      padding: clamp(24px, 4vw, 32px);
       display: grid;
       grid-template-columns: 1fr;
-      gap: 28px;
+      gap: 24px;
       align-items: center;
       color: #FFFFFF;
+      margin-bottom: 24px;
     }
 
     .impact-box .section-eyebrow {
       color: var(--sky-blue);
     }
 
-    @media (min-width: 860px) {
+    @media (min-width: 820px) {
       .impact-box {
-        grid-template-columns: 1.2fr 0.8fr;
-        gap: 36px;
+        grid-template-columns: 1fr auto;
+        gap: 28px;
       }
     }
 
     .impact-content h3 {
       font-family: var(--font-title);
-      font-size: clamp(24px, 4.5vw, 30px);
+      font-size: clamp(22px, 4vw, 28px);
       font-weight: 700;
-      margin-bottom: 14px;
+      margin-bottom: 8px;
       line-height: 1.25;
       color: #FFFFFF;
     }
 
     .impact-content p {
-      font-size: 15px;
-      color: var(--sky-blue);
+      font-size: 14px;
+      color: rgba(255, 255, 255, 0.85);
       line-height: 1.6;
-      margin-bottom: 20px;
+      max-width: 680px;
+      margin-bottom: 14px;
+    }
+
+    .impact-logo {
+      background: #FFFFFF;
+      width: 176px;
+      height: 176px;
+      border-radius: 50%;
+      padding: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.22);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      text-decoration: none;
+      justify-self: center;
+      flex-shrink: 0;
+    }
+
+    .impact-logo:hover {
+      transform: scale(1.04);
+      box-shadow: 0 14px 30px rgba(0, 0, 0, 0.3);
+    }
+
+    .impact-logo img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
     }
 
     .ods-badges {
       display: flex;
       flex-wrap: wrap;
-      gap: 10px;
+      gap: 8px;
     }
 
     .ods-badge {
       display: inline-flex;
       align-items: center;
-      gap: 6px;
       padding: 6px 12px;
-      border-radius: 10px;
+      border-radius: 999px;
       font-size: 12px;
       font-weight: 600;
-      background: rgba(255, 255, 255, 0.12);
-      border: 1px solid rgba(167, 202, 223, 0.25);
+      background: rgba(167, 202, 223, 0.16);
+      border: 1px solid rgba(167, 202, 223, 0.35);
+      color: var(--sky-blue);
+    }
+
+    /* Tracking Record · Línea de tiempo */
+    .tracking-head {
+      text-align: center;
+      max-width: 680px;
+      margin: 0 auto 22px;
+    }
+
+    .tracking-head h3 {
+      font-family: var(--font-title);
+      font-size: clamp(26px, 4.5vw, 32px);
+      color: var(--dark-blue);
+    }
+
+    .timeline {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 50%;
+      top: 12px;
+      bottom: 12px;
+      width: 3px;
+      background: var(--sky-blue);
+      transform: translateX(-50%);
+    }
+
+    .tl-item {
+      display: grid;
+      grid-template-columns: 1fr 48px 1fr;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .tl-item + .tl-item {
+      margin-top: -170px;
+    }
+
+    .tl-dot {
+      width: 40px;
+      height: 40px;
+      margin: 0 auto;
+      border-radius: 50%;
+      background: var(--dark-blue);
       color: #FFFFFF;
+      border: 4px solid var(--bg);
+      box-shadow: 0 0 0 2px var(--sky-blue);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 700;
+      z-index: 2;
+    }
+
+    .tl-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 8px 24px rgba(13, 36, 59, 0.06);
+    }
+
+    .tl-photo-btn {
+      display: block;
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      padding: 0;
+      border: 0;
+      background: var(--bg-card-subtle);
+      cursor: zoom-in;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .tl-photo-btn img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: opacity 0.2s ease;
+    }
+
+    .tl-photo-btn:hover img {
+      opacity: 0.92;
+    }
+
+    .tl-zoom-hint {
+      position: absolute;
+      right: 10px;
+      bottom: 10px;
+      background: rgba(13, 36, 59, 0.78);
+      color: #FFFFFF;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 999px;
+    }
+
+    .tl-body {
+      padding: 16px 20px;
+    }
+
+    .tl-stage {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--blue-jeans);
+      background: var(--bg-card-subtle);
+      padding: 4px 10px;
+      border-radius: 999px;
+      margin-bottom: 8px;
+    }
+
+    .tl-title {
+      font-family: var(--font-title);
+      font-size: 20px;
+      color: var(--dark-blue);
+      margin-bottom: 6px;
+      line-height: 1.25;
+    }
+
+    .tl-desc {
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.55;
+    }
+
+    .tl-item.reverse .tl-card { grid-column: 3; grid-row: 1; }
+    .tl-item.reverse .tl-dot { grid-column: 2; grid-row: 1; }
+    .tl-item.reverse .tl-spacer { grid-column: 1; grid-row: 1; }
+
+    @media (max-width: 820px) {
+      .timeline { gap: 22px; }
+      .timeline::before { left: 20px; transform: none; }
+      .tl-item, .tl-item.reverse { grid-template-columns: 40px 1fr; }
+      .tl-item + .tl-item { margin-top: 0; }
+      .tl-dot, .tl-item.reverse .tl-dot { grid-column: 1; grid-row: 1; }
+      .tl-card, .tl-item.reverse .tl-card { grid-column: 2; grid-row: 1; }
+      .tl-spacer { display: none; }
+    }
+
+    /* Lightbox de fotos */
+    .lightbox {
+      position: fixed;
+      inset: 0;
+      background: rgba(13, 36, 59, 0.88);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      z-index: 200;
+    }
+
+    .lightbox.open { display: flex; }
+
+    .lb-box {
+      max-width: 820px;
+      width: 100%;
+      background: var(--bg-card);
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
+    }
+
+    .lb-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+      color: var(--dark-blue);
+    }
+
+    .lb-close {
+      min-height: 44px;
+      padding: 8px 14px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--dark-blue);
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .lb-img-wrap {
+      background: #0B1726;
+      display: flex;
+      justify-content: center;
+      max-height: 68vh;
+    }
+
+    .lb-img-wrap img {
+      max-width: 100%;
+      max-height: 68vh;
+      object-fit: contain;
+    }
+
+    .lb-foot {
+      padding: 14px 18px;
+      font-size: 13px;
+      color: var(--text-muted);
     }
 
     /* Footer */
@@ -795,7 +1035,7 @@
         <a href="#demo" class="nav-link">Simulador</a>
         <a href="#alertas" class="nav-link">Alertas</a>
         <a href="#modelo" class="nav-link">Modelo Freemium</a>
-        <a href="#impacto" class="nav-link">Impacto Social</a>
+        <a href="#tracking" class="nav-link">Tracking Record</a>
       </div>
 
       <div style="display: flex; gap: 8px;">
@@ -1141,30 +1381,48 @@
     </div>
   </section>
 
-  <!-- Social Impact Section -->
-  <section class="impact-section" id="impacto">
+  <!-- Social Impact + Tracking Record Section -->
+  <section class="impact-section" id="tracking">
     <div class="container">
       <div class="impact-box">
         <div class="impact-content">
           <div class="section-eyebrow">Compromiso Enactus</div>
-          <h3>Tecnología con Propósito y Medición de Impacto</h3>
+          <h3>Tecnología con Propósito e Impacto Social</h3>
           <p>
-            Enactus impulsa a la siguiente generación de líderes empresariales que utilizan la innovación para transformar vidas. Ziva no es solo una app móvil: es un ecosistema de derechos humanos que permite a las personas con discapacidad auditiva acceder a la educación superior y al empleo digno con total seguridad.
+            Enactus impulsa soluciones reales para que personas con discapacidad auditiva accedan a la educación y al empleo con seguridad.
           </p>
           <div class="ods-badges">
-            <span class="ods-badge">🎯 ODS 10: Reducción de Desigualdades</span>
-            <span class="ods-badge">📚 ODS 4: Educación Inclusiva</span>
-            <span class="ods-badge">🛡️ ODS 3: Salud y Bienestar</span>
+            <span class="ods-badge">ODS 10. Reducción de las desigualdades</span>
+            <span class="ods-badge">ODS 9. Industria, innovación e infraestructura</span>
+            <span class="ods-badge">ODS 4. Alianzas para lograr los objetivos</span>
           </div>
         </div>
-        <div style="background: rgba(13, 36, 59, 0.35); border: 1px solid rgba(167, 202, 223, 0.2); border-radius: 20px; padding: 24px; text-align: center;">
-          <div style="font-size: 48px; margin-bottom: 10px;">🇲🇽</div>
-          <div style="font-family: var(--font); font-size: 19px; font-weight: 600; color: #FFF; margin-bottom: 6px;">Enactus México</div>
-          <div style="font-size: 13px; color: var(--sky-blue);">Competencia Nacional de Emprendimiento Social · Prototipo MVP Funcional</div>
-        </div>
+        <a href="https://www.instagram.com/enactustecmicuu/" target="_blank" rel="noopener noreferrer" class="impact-logo" aria-label="Visitar el Instagram de Enactus Tecmilenio Chihuahua">
+          <img src="assets/tracking-record/hub-chih-logo.png" alt="Logo Enactus Tecmilenio Chihuahua">
+        </a>
       </div>
+
+      <div class="tracking-head">
+        <h3>Nuestro recorrido con Ziva</h3>
+      </div>
+
+      <div class="timeline" id="trackingTimeline"></div>
     </div>
   </section>
+
+  <!-- Visor de fotos del Tracking Record -->
+  <div class="lightbox" id="trackingLightbox" role="dialog" aria-modal="true" aria-labelledby="lbTitle" onclick="if(event.target===this) closeTrackingLb()">
+    <div class="lb-box">
+      <div class="lb-head">
+        <strong id="lbTitle"></strong>
+        <button type="button" class="lb-close" onclick="closeTrackingLb()">Cerrar ✕</button>
+      </div>
+      <div class="lb-img-wrap">
+        <img id="lbImg" src="" alt="">
+      </div>
+      <div class="lb-foot" id="lbDesc"></div>
+    </div>
+  </div>
 
   <!-- Footer -->
   <footer class="footer">
@@ -1186,18 +1444,89 @@
         <span style="font-family: var(--font); font-weight: 600; color: var(--text-main);">Ziva · Asistente de Accesibilidad Auditiva</span>
       </div>
 
-      <div class="footer-links">
-        <a href="app.html" target="_blank">Prototipo Móvil</a>
-        <a href="#funciones">Funciones</a>
-        <a href="#modelo">Precios</a>
-        <a href="https://github.com" target="_blank">GitHub</a>
-      </div>
-
       <div>
-        <span>© 2026 Equipo Enactus. Construido para accesibilidad e inclusión.</span>
+        <span>© 2026 Enactus Tecmilenio Chihuahua. Construido para accesibilidad e inclusión.</span>
       </div>
     </div>
   </footer>
+
+  <script>
+    const TRACKING_HITOS = [
+      {
+        num: '01',
+        src: 'assets/tracking-record/1-en-competencia-nacional-25.jpeg',
+        thumb: 'assets/tracking-record/thumbs/1-en-competencia-nacional-25.jpeg',
+        stage: 'Competencia Nacional Enactus 2026 · Agosto 2026',
+        title: 'Competencia Nacional Enactus 2026',
+        desc: 'Durante esta competencia participamos con un proyecto de impacto social, donde obtuvimos experiencia y entendimos mejor el enfoque de la competencia.'
+      },
+      {
+        num: '02',
+        src: 'assets/tracking-record/2-mesa-retroalimentaci%C3%B3n.jpeg',
+        thumb: 'assets/tracking-record/thumbs/2-mesa-retroalimentaci%C3%B3n.jpeg',
+        stage: 'Mesas de retroalimentación',
+        title: 'Retroalimentación en proyectos',
+        desc: 'A lo largo del recorrido siempre hemos tenido retroalimentación para atender las necesidades reales.'
+      },
+      {
+        num: '03',
+        src: 'assets/tracking-record/3-reunion-sordos.jpeg',
+        thumb: 'assets/tracking-record/thumbs/3-reunion-sordos.jpeg',
+        stage: 'Acercamiento con comunidad sorda',
+        title: 'Reunión con Nadia y Emeric',
+        desc: 'Gracias a nuestra plática con Nadia y Emeric, que forman parte de la comunidad sorda, pudimos empatizar y darnos cuenta de las necesidades reales. De esta manera nos aseguramos de dar soluciones adecuadas a problemas reales.'
+      },
+      {
+        num: '04',
+        src: 'assets/tracking-record/4-trabajando-en-app.jpeg',
+        thumb: 'assets/tracking-record/thumbs/4-trabajando-en-app.jpeg',
+        stage: 'Inicio del desarrollo de la App',
+        title: 'Desarrollo de la App',
+        desc: 'Gracias a nuestro acercamiento con la comunidad pudimos empezar con el prototipo de una solución de software para ayudar en entornos sociales, educativos y la vida cotidiana.'
+      },
+      {
+        num: '05',
+        src: 'assets/tracking-record/5-pej.jpeg',
+        thumb: 'assets/tracking-record/thumbs/5-pej.jpeg',
+        stage: 'Noviembre 2026',
+        title: 'Premio Estatal de la Juventud 2026',
+        desc: 'Participamos en la convocatoria del Premio Estatal de la Juventud, por parte del Instituto Chihuahuense de la Juventud (ICHIJUV), en la categoría «Inclusión Social», donde ganamos el primer lugar como galardonados con nuestro proyecto.'
+      }
+    ];
+
+    document.getElementById('trackingTimeline').innerHTML = TRACKING_HITOS.map((h, i) => `
+      <div class="tl-item ${i % 2 === 1 ? 'reverse' : ''}">
+        <article class="tl-card">
+          <button type="button" class="tl-photo-btn" onclick="openTrackingLb(${i})">
+            <img src="${h.thumb}" onerror="this.onerror=null;this.src='${h.src}'" alt="${h.title}">
+            <span class="tl-zoom-hint">Ampliar</span>
+          </button>
+          <div class="tl-body">
+            <span class="tl-stage">${h.stage}</span>
+            <h4 class="tl-title">${h.title}</h4>
+            <p class="tl-desc">${h.desc}</p>
+          </div>
+        </article>
+        <div class="tl-dot">${h.num}</div>
+        <div class="tl-spacer"></div>
+      </div>
+    `).join('');
+
+    function openTrackingLb(i) {
+      const h = TRACKING_HITOS[i];
+      document.getElementById('lbTitle').textContent = h.num + ' · ' + h.title;
+      document.getElementById('lbImg').src = h.src;
+      document.getElementById('lbImg').alt = h.title;
+      document.getElementById('lbDesc').textContent = h.desc;
+      document.getElementById('trackingLightbox').classList.add('open');
+    }
+
+    function closeTrackingLb() {
+      document.getElementById('trackingLightbox').classList.remove('open');
+    }
+
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeTrackingLb(); });
+  </script>
 
 </body>
 </html>

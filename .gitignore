@@ -24,3 +24,10 @@ docs/bocetos/
 # Herramientas de IA (configuración local)
 .gemini/
 .agent/
+
+# Archivos de trabajo y vistas previas (no necesarios en GitHub Pages)
+assets/tracking-record/descripciones.md
+preview-*.html
+Desktop.ini
+*.bak
+*.swp
